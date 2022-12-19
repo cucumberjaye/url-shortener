@@ -20,13 +20,13 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "expect /<id>", http.StatusBadRequest)
 			return
 		}
-		shortUrl := r.URL.Path[1:]
-		fullUrl, err := h.Service.GetFullURL(shortUrl)
+		shortURL := r.URL.Path[1:]
+		fullURL, err := h.Service.GetFullURL(shortURL)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Header().Set("Location", fullUrl)
+		w.Header().Set("Location", fullURL)
 		w.WriteHeader(307)
 	case http.MethodPost:
 		body, err := io.ReadAll(r.Body)
@@ -37,13 +37,13 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 		if len(body) == 0 {
 			http.Error(w, "body is empty", http.StatusBadRequest)
 		}
-		shortUrl, err := h.Service.ShortingURL(string(body))
+		shortURL, err := h.Service.ShortingURL(string(body))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusCreated)
 
-		w.Write([]byte(shortUrl))
+		w.Write([]byte(shortURL))
 	}
 }
