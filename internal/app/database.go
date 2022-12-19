@@ -11,17 +11,17 @@ func NewDB() *Database {
 	return &Database{Store: store}
 }
 
-func (d *Database) SetUrl(fullUrl, shortUrl string) error {
-	if _, ok := d.Store[shortUrl]; !ok {
-		d.Store[shortUrl] = fullUrl
+func (d *Database) SetURL(fullURL, shortURL string) error {
+	if _, ok := d.Store[shortURL]; !ok {
+		d.Store[shortURL] = fullURL
 		return nil
 	} else {
 		return errors.New("url already exist")
 	}
 }
 
-func (d *Database) GetUrl(shortUrl string) (string, error) {
-	if url, ok := d.Store[shortUrl]; !ok {
+func (d *Database) GetURL(shortURL string) (string, error) {
+	if url, ok := d.Store[shortURL]; !ok {
 		return "", errors.New("url is not exist")
 	} else {
 		return url, nil

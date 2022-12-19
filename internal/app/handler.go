@@ -21,7 +21,7 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		shortUrl := r.URL.Path[1:]
-		fullUrl, err := h.Service.GetFullUrl(shortUrl)
+		fullUrl, err := h.Service.GetFullURL(shortUrl)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -37,7 +37,7 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 		if len(body) == 0 {
 			http.Error(w, "body is empty", http.StatusBadRequest)
 		}
-		shortUrl, err := h.Service.ShortingUrl(string(body))
+		shortUrl, err := h.Service.ShortingURL(string(body))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

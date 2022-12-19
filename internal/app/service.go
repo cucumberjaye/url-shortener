@@ -12,22 +12,22 @@ func NewService(db *Database) *Service {
 	return &Service{db: db}
 }
 
-func (s *Service) ShortingUrl(fullUrl string) (string, error) {
-	shortUrl := shorting()
-	if err := s.db.SetUrl(fullUrl, shortUrl); err != nil {
+func (s *Service) ShortingURL(fullURL string) (string, error) {
+	shortURL := shorting()
+	if err := s.db.SetURL(fullURL, shortURL); err != nil {
 		return "", err
 	}
 
-	return shortUrl, nil
+	return "http://localhost:8080/" + shortURL, nil
 }
 
-func (s *Service) GetFullUrl(shortUrl string) (string, error) {
-	fullUrl, err := s.db.GetUrl(shortUrl)
+func (s *Service) GetFullURL(shortURL string) (string, error) {
+	fullURL, err := s.db.GetURL(shortURL)
 	if err != nil {
 		return "", err
 	}
 
-	return fullUrl, err
+	return fullURL, err
 }
 
 func shorting() string {
