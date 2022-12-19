@@ -29,10 +29,6 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Location", fullUrl)
 		w.WriteHeader(307)
 	case http.MethodPost:
-		if r.Header.Get("Content-Type") != "text/plain" {
-			http.Error(w, "expected json format", http.StatusBadRequest)
-			return
-		}
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -47,6 +43,7 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.WriteHeader(http.StatusCreated)
+
 		w.Write([]byte(shortUrl))
 	}
 }
