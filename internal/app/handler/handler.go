@@ -1,15 +1,16 @@
-package app
+package handler
 
 import (
+	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"io"
 	"net/http"
 )
 
 type Handler struct {
-	Service *Service
+	Service *service.Service
 }
 
-func NewHandler(service *Service) *Handler {
+func NewHandler(service *service.Service) *Handler {
 	return &Handler{Service: service}
 }
 
@@ -21,7 +22,7 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		shortURL := r.URL.Path[1:]
-		fullURL, err := h.Service.GetFullURL(shortURL)
+		fullURL, err := h.Service.Shortener.GetFullURL(shortURL)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -37,7 +38,7 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 		if len(body) == 0 {
 			http.Error(w, "body is empty", http.StatusBadRequest)
 		}
-		shortURL, err := h.Service.ShortingURL(string(body))
+		shortURL, err := h.Service.Shortener.ShortingURL(string(body))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -1,4 +1,4 @@
-package app
+package repository
 
 import "errors"
 
@@ -6,7 +6,7 @@ type Database struct {
 	Store map[string]string
 }
 
-func NewDB() *Database {
+func NewShortenerDB() *Database {
 	store := make(map[string]string)
 	return &Database{Store: store}
 }
