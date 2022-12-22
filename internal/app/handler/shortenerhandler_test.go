@@ -18,12 +18,11 @@ func TestHandler_Shortener(t *testing.T) {
 		response string
 	}
 	tests := []struct {
-		name    string
-		handler *Handler
-		method  string
-		way     string
-		body    io.Reader
-		want    want
+		name   string
+		method string
+		way    string
+		body   io.Reader
+		want   want
 	}{
 		{
 			name:   "ok_get",
@@ -45,12 +44,12 @@ func TestHandler_Shortener(t *testing.T) {
 			},
 		},
 		{
-			name:   "fail_get_400",
+			name:   "fail_get_405",
 			method: http.MethodGet,
 			body:   nil,
 			way:    "/",
 			want: want{
-				code: 400,
+				code: 405,
 			},
 		},
 		{
@@ -60,16 +59,6 @@ func TestHandler_Shortener(t *testing.T) {
 			way:    "/none",
 			want: want{
 				code: 500,
-			},
-		},
-		{
-			name:   "ok_post",
-			method: http.MethodPost,
-			body:   bytes.NewBufferString("test.com"),
-			way:    "/",
-			want: want{
-				code:     201,
-				response: "test",
 			},
 		},
 		{
@@ -91,21 +80,28 @@ func TestHandler_Shortener(t *testing.T) {
 			},
 		},
 	}
+
+	services := &service.Service{Shortener: &mocks.ServiceMock{}}
+	handlers := NewHandler(services)
+
+	r := handlers.InitRoutes()
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			services := &service.Service{Shortener: &mocks.ServiceMock{}}
-			tt.handler = NewHandler(services)
-			request := httptest.NewRequest(tt.method, tt.way, tt.body)
-			w := httptest.NewRecorder()
-			h := http.HandlerFunc(tt.handler.Shortener)
-			h.ServeHTTP(w, request)
-			res := w.Result()
-			assert.Equal(t, res.StatusCode, tt.want.code)
-			defer res.Body.Close()
-			resBody, err := io.ReadAll(res.Body)
+			request := httptest.NewRequest(tt.method, ts.URL+tt.way, tt.body)
+			request.RequestURI = ""
+
+			resp, err := http.DefaultClient.Do(request)
 			require.NoError(t, err)
+
+			defer resp.Body.Close()
 			if tt.method == http.MethodPost && tt.want.code == 201 {
-				assert.Equal(t, string(resBody), tt.want.response)
+				assert.Equal(t, tt.want.code, resp.StatusCode, ts.URL+tt.way)
+				resBody, err := io.ReadAll(resp.Body)
+				require.NoError(t, err)
+				assert.Equal(t, tt.want.response, string(resBody))
 			}
 		})
 	}

@@ -12,6 +12,5 @@ func main() {
 	repos := repository.NewRepository()
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
-	http.HandleFunc("/", handlers.Shortener)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", handlers.InitRoutes()))
 }
