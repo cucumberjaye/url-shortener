@@ -1,7 +1,6 @@
-package service
+package hexshortener
 
 import (
-	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/mocks"
 	"testing"
 )
@@ -18,7 +17,7 @@ func TestShortenerService_GetFullURL(t *testing.T) {
 	}{
 		{
 			name:    "ok",
-			args:    args{shortURL: "test"},
+			args:    args{shortURL: "0"},
 			want:    "test.com",
 			wantErr: false,
 		},
@@ -29,8 +28,8 @@ func TestShortenerService_GetFullURL(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	repos := &repository.Repository{Shortener: &mocks.RepositoryMock{}}
-	services := NewService(repos)
+	repos := &mocks.RepositoryMock{}
+	services := NewShortenerService(repos)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := services.GetFullURL(tt.args.shortURL)
@@ -65,8 +64,8 @@ func TestShortenerService_ShortingURL(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	repos := &repository.Repository{Shortener: &mocks.RepositoryMock{}}
-	services := NewService(repos)
+	repos := &mocks.RepositoryMock{}
+	services := NewShortenerService(repos)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := services.ShortingURL(tt.args.fullURL)

@@ -2,15 +2,15 @@ package main
 
 import (
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
-	"github.com/cucumberjaye/url-shortener/internal/app/repository"
-	"github.com/cucumberjaye/url-shortener/internal/app/service"
+	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
+	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
 	"log"
 	"net/http"
 )
 
 func main() {
-	repos := repository.NewRepository()
-	services := service.NewService(repos)
+	db := localstore.NewShortenerDB()
+	services := hexshortener.NewShortenerService(db)
 	handlers := handler.NewHandler(services)
 	log.Fatal(http.ListenAndServe(":8080", handlers.InitRoutes()))
 }

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,7 +27,7 @@ func TestHandler_Shortener(t *testing.T) {
 			name:   "ok_get",
 			method: http.MethodGet,
 			body:   nil,
-			way:    "/test",
+			way:    "/0",
 			want: want{
 				code: 307,
 			},
@@ -40,7 +39,7 @@ func TestHandler_Shortener(t *testing.T) {
 			way:    "/",
 			want: want{
 				code:     201,
-				response: "test",
+				response: "/0",
 			},
 		},
 		{
@@ -56,7 +55,7 @@ func TestHandler_Shortener(t *testing.T) {
 			name:   "fail_get_500",
 			method: http.MethodGet,
 			body:   nil,
-			way:    "/none",
+			way:    "/error",
 			want: want{
 				code: 500,
 			},
@@ -73,7 +72,7 @@ func TestHandler_Shortener(t *testing.T) {
 		{
 			name:   "fail_post_500",
 			method: http.MethodPost,
-			body:   bytes.NewBufferString("none"),
+			body:   bytes.NewBufferString("error"),
 			way:    "/",
 			want: want{
 				code: 500,
@@ -81,7 +80,7 @@ func TestHandler_Shortener(t *testing.T) {
 		},
 	}
 
-	services := &service.Service{Shortener: &mocks.ServiceMock{}}
+	services := &mocks.ServiceMock{}
 	handlers := NewHandler(services)
 
 	r := handlers.InitRoutes()
@@ -101,7 +100,7 @@ func TestHandler_Shortener(t *testing.T) {
 				assert.Equal(t, tt.want.code, resp.StatusCode, ts.URL+tt.way)
 				resBody, err := io.ReadAll(resp.Body)
 				require.NoError(t, err)
-				assert.Equal(t, tt.want.response, string(resBody))
+				assert.Equal(t, ts.URL[7:]+tt.want.response, string(resBody))
 			}
 		})
 	}
