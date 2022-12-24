@@ -34,7 +34,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	shortURL = r.Host + r.URL.Path + shortURL
+	shortURL = "http://" + r.Host + r.URL.Path + shortURL
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(shortURL))

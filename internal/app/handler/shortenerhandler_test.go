@@ -100,7 +100,7 @@ func TestHandler_Shortener(t *testing.T) {
 				assert.Equal(t, tt.want.code, resp.StatusCode, ts.URL+tt.way)
 				resBody, err := io.ReadAll(resp.Body)
 				require.NoError(t, err)
-				assert.Equal(t, ts.URL[7:]+tt.want.response, string(resBody))
+				assert.Equal(t, ts.URL+tt.want.response, string(resBody))
 			}
 		})
 	}
