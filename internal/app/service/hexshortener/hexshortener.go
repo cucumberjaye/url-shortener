@@ -2,15 +2,16 @@ package hexshortener
 
 import (
 	"fmt"
-	"github.com/cucumberjaye/url-shortener/internal/app/repository"
+	"github.com/cucumberjaye/url-shortener/internal/app/service"
+	"sync/atomic"
 )
 
 type ShortenerService struct {
-	repos   repository.URLRepository
-	counter int
+	repos   service.URLRepository
+	counter int64
 }
 
-func NewShortenerService(repos repository.URLRepository) *ShortenerService {
+func NewShortenerService(repos service.URLRepository) *ShortenerService {
 	return &ShortenerService{repos: repos}
 }
 
@@ -19,7 +20,7 @@ func (s *ShortenerService) ShortingURL(fullURL string) (string, error) {
 	if err := s.repos.SetURL(fullURL, shortURL); err != nil {
 		return "", err
 	}
-	s.counter++
+	atomic.AddInt64(&s.counter, 1)
 
 	return shortURL, nil
 }

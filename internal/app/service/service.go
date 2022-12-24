@@ -1,6 +1,6 @@
 package service
 
-type URLService interface {
-	ShortingURL(fullURL string) (string, error)
-	GetFullURL(shortURL string) (string, error)
+type URLRepository interface {
+	SetURL(fullURL, shortURL string) error
+	GetURL(shortURL string) (string, error)
 }

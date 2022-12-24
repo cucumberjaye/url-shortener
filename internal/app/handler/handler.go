@@ -1,15 +1,19 @@
 package handler
 
 import (
-	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/go-chi/chi"
 )
 
-type Handler struct {
-	Service service.URLService
+type URLService interface {
+	ShortingURL(fullURL string) (string, error)
+	GetFullURL(shortURL string) (string, error)
 }
 
-func NewHandler(service service.URLService) *Handler {
+type Handler struct {
+	Service URLService
+}
+
+func NewHandler(service URLService) *Handler {
 	return &Handler{Service: service}
 }
 
