@@ -2,7 +2,8 @@ package handler
 
 import (
 	"bytes"
-	"github.com/cucumberjaye/url-shortener/internal/app/service/mocks"
+	"github.com/cucumberjaye/url-shortener/internal/service/mocks"
+	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
@@ -80,8 +81,11 @@ func TestHandler_Shortener(t *testing.T) {
 		},
 	}
 
-	services := &mocks.ServiceMock{}
-	handlers := NewHandler(services)
+	logger.New()
+	logger.Discard()
+	URLservices := &mocks.ServiceMock{}
+	logsServices := &mocks.LogsMock{}
+	handlers := NewHandler(URLservices, logsServices)
 
 	r := handlers.InitRoutes()
 	ts := httptest.NewServer(r)

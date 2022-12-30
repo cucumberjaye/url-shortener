@@ -1,7 +1,7 @@
 package hexshortener
 
 import (
-	"github.com/cucumberjaye/url-shortener/internal/app/repository/mocks"
+	"github.com/cucumberjaye/url-shortener/internal/repository/mocks"
 	"testing"
 )
 

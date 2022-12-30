@@ -4,17 +4,27 @@ import (
 	"github.com/go-chi/chi"
 )
 
+const protocol = "http"
+
+type LogsInfoService interface {
+	GetRequestCount(shortURL string) (int, error)
+}
+
 type URLService interface {
 	ShortingURL(fullURL string) (string, error)
 	GetFullURL(shortURL string) (string, error)
 }
 
 type Handler struct {
-	Service URLService
+	Service       URLService
+	LoggerService LogsInfoService
 }
 
-func NewHandler(service URLService) *Handler {
-	return &Handler{Service: service}
+func NewHandler(service URLService, logsService LogsInfoService) *Handler {
+	return &Handler{
+		Service:       service,
+		LoggerService: logsService,
+	}
 }
 
 func (h *Handler) InitRoutes() *chi.Mux {

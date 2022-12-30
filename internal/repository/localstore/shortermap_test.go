@@ -1,6 +1,7 @@
 package localstore
 
 import (
+	"sync"
 	"testing"
 )
 
@@ -37,6 +38,8 @@ func TestDatabase_GetURL(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			d := &LocalStorage{
 				Store: tt.fields.Store,
+				Exist: map[string]int{},
+				mx:    sync.Mutex{},
 			}
 			got, err := d.GetURL(tt.args.shortURL)
 			if (err != nil) != tt.wantErr {
@@ -53,7 +56,7 @@ func TestDatabase_GetURL(t *testing.T) {
 func TestDatabase_SetURL(t *testing.T) {
 	type fields struct {
 		Store map[string]string
-		Exist map[string]struct{}
+		Exist map[string]int
 	}
 	type args struct {
 		fullURL  string
@@ -69,7 +72,7 @@ func TestDatabase_SetURL(t *testing.T) {
 			name: "ok",
 			fields: fields{
 				Store: map[string]string{},
-				Exist: map[string]struct{}{},
+				Exist: map[string]int{},
 			},
 			args:    args{shortURL: "0", fullURL: "test.com"},
 			wantErr: false,
@@ -78,7 +81,7 @@ func TestDatabase_SetURL(t *testing.T) {
 			name: "error",
 			fields: fields{
 				Store: map[string]string{"0": "test.com"},
-				Exist: map[string]struct{}{"test.com": {}},
+				Exist: map[string]int{"test.com": 0},
 			},
 			args:    args{shortURL: "0", fullURL: "test.com"},
 			wantErr: true,
