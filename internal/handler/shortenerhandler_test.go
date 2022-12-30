@@ -83,9 +83,9 @@ func TestHandler_Shortener(t *testing.T) {
 
 	logger.New()
 	logger.Discard()
-	URLservices := &mocks.ServiceMock{}
+	URLServices := &mocks.ServiceMock{}
 	logsServices := &mocks.LogsMock{}
-	handlers := NewHandler(URLservices, logsServices)
+	handlers := NewHandler(URLServices, logsServices)
 
 	r := handlers.InitRoutes()
 	ts := httptest.NewServer(r)
