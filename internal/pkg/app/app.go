@@ -1,10 +1,10 @@
 package app
 
 import (
-	"github.com/cucumberjaye/url-shortener/internal/handler"
-	"github.com/cucumberjaye/url-shortener/internal/repository/localstore"
-	"github.com/cucumberjaye/url-shortener/internal/service/hexshortener"
-	"github.com/cucumberjaye/url-shortener/internal/service/shortenerlogsinfo"
+	"github.com/cucumberjaye/url-shortener/internal/app/handler"
+	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
+	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
+	"github.com/cucumberjaye/url-shortener/internal/app/service/shortenerlogsinfo"
 )
 
 type App struct {

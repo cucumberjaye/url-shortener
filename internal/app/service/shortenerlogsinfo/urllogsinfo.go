@@ -1,7 +1,7 @@
 package shortenerlogsinfo
 
 import (
-	"github.com/cucumberjaye/url-shortener/internal/service"
+	"github.com/cucumberjaye/url-shortener/internal/app/service"
 )
 
 type URLLogsInfo struct {

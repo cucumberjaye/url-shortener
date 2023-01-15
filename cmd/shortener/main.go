@@ -1,7 +1,7 @@
 package main
 
 import (
-	app_ "github.com/cucumberjaye/url-shortener/internal/app"
+	app_ "github.com/cucumberjaye/url-shortener/internal/pkg/app"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"net/http"
 )

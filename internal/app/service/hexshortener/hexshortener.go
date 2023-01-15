@@ -2,7 +2,7 @@ package hexshortener
 
 import (
 	"fmt"
-	"github.com/cucumberjaye/url-shortener/internal/service"
+	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"sync/atomic"
 )
 

@@ -4,7 +4,10 @@ import (
 	"github.com/go-chi/chi"
 )
 
-const protocol = "http"
+const (
+	protocol   = "http"
+	getURLPath = "/"
+)
 
 type LogsInfoService interface {
 	GetRequestCount(shortURL string) (int, error)
@@ -32,6 +35,9 @@ func (h *Handler) InitRoutes() *chi.Mux {
 
 	r.Post("/", h.shortener)
 	r.Get("/{short}", h.getFullURL)
+	r.Route("/api", func(r chi.Router) {
+		r.Post("/shorten", h.JSONShortener)
+	})
 
 	return r
 }
