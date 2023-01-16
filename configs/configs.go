@@ -5,12 +5,12 @@ import "os"
 var (
 	ServerAddress string
 	BaseURL       string
-	Protocol      string
+	Scheme        string
 )
 
 const (
 	defaultServerAddress = "localhost:8080"
-	defaultProtocol      = "http"
+	defaultScheme        = "http"
 )
 
 func LoadConfig() {
@@ -23,8 +23,8 @@ func LoadConfig() {
 
 	BaseURL = os.Getenv("BASE_URL")
 
-	Protocol, ok = os.LookupEnv("PROTOCOL")
+	Scheme, ok = os.LookupEnv("SCHEME")
 	if !ok {
-		Protocol = defaultProtocol
+		Scheme = defaultScheme
 	}
 }
