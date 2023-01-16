@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"fmt"
+	"github.com/cucumberjaye/url-shortener/configs"
 	mocks2 "github.com/cucumberjaye/url-shortener/internal/app/service/mocks"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/stretchr/testify/assert"
@@ -84,6 +85,7 @@ func TestHandler_Shortener(t *testing.T) {
 
 	logger.New()
 	logger.Discard()
+	configs.LoadConfig()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
 	handlers := NewHandler(URLServices, logsServices)
@@ -153,6 +155,7 @@ func TestHandler_JSONShortener(t *testing.T) {
 
 	logger.New()
 	logger.Discard()
+	configs.LoadConfig()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
 	handlers := NewHandler(URLServices, logsServices)
