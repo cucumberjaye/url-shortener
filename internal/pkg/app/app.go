@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
@@ -12,6 +13,7 @@ type App struct {
 }
 
 func New() *App {
+	configs.LoadConfig()
 	repos := localstore.NewShortenerDB()
 	serviceURL := hexshortener.NewShortenerService(repos)
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)

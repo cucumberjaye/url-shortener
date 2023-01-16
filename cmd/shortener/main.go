@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/cucumberjaye/url-shortener/configs"
 	app_ "github.com/cucumberjaye/url-shortener/internal/pkg/app"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"net/http"
@@ -9,5 +10,5 @@ import (
 func main() {
 	logger.New()
 	app := app_.New()
-	logger.ErrorLogger.Fatal(http.ListenAndServe(":8080", app.Handlers.InitRoutes()))
+	logger.ErrorLogger.Fatal(http.ListenAndServe(configs.ServerAddress, app.Handlers.InitRoutes()))
 }

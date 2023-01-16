@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/go-chi/chi"
 	"io"
@@ -13,7 +14,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	fullURL, err := h.Service.GetFullURL(shortURL)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s: %s", r.Method, protocol+"://"+r.Host+r.URL.Path, err.Error())
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, err.Error())
 		return
 	}
 	w.Header().Set("Location", fullURL)
@@ -21,32 +22,32 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 
 	requestCount, err := h.LoggerService.GetRequestCount(shortURL)
 	if err != nil {
-		logger.WarningLogger.Printf("%s  %s: %s", r.Method, protocol+"://"+r.Host+r.URL.Path, err.Error())
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, err.Error())
 		return
 	}
-	logger.InfoLogger.Printf("%s  URL: %s has been used, total uses: %d", r.Method, protocol+"://"+r.Host+r.URL.Path, requestCount)
+	logger.InfoLogger.Printf("%s  URL: %s has been used, total uses: %d", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, requestCount)
 }
 
 func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s: %s", r.Method, protocol+"://"+r.Host+r.URL.Path, err.Error())
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, err.Error())
 		return
 	}
 	if len(body) == 0 {
 		http.Error(w, "body is empty", http.StatusBadRequest)
-		logger.WarningLogger.Printf("%s  %s: %s", r.Method, protocol+"://"+r.Host+r.URL.Path, "body is empty")
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, "body is empty")
 		return
 	}
 	fullURL := string(body)
 	shortURL, err := h.Service.ShortingURL(fullURL)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, protocol+"://"+r.Host+r.URL.Path, fullURL, err.Error())
+		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, fullURL, err.Error())
 		return
 	}
-	shortURL = "http://" + r.Host + getURLPath + shortURL
+	shortURL = baseURL(r) + shortURL
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(shortURL))
@@ -64,19 +65,19 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s: %s", r.Method, protocol+"://"+r.Host+r.URL.Path, err.Error())
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, err.Error())
 		return
 	}
 	if len(body) == 0 {
 		http.Error(w, "body is empty", http.StatusBadRequest)
-		logger.WarningLogger.Printf("%s  %s: %s", r.Method, protocol+"://"+r.Host+r.URL.Path, "body is empty")
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, "body is empty")
 		return
 	}
 
 	err = json.Unmarshal(body, &input)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s:  %s", r.Method, protocol+"://"+r.Host+r.URL.Path, err.Error())
+		logger.WarningLogger.Printf("%s  %s:  %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, err.Error())
 		return
 	}
 
@@ -84,10 +85,10 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 	shortURL, err := h.Service.ShortingURL(fullURL)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, protocol+"://"+r.Host+r.URL.Path, fullURL, err.Error())
+		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, configs.Protocol+"://"+r.Host+r.URL.Path, fullURL, err.Error())
 		return
 	}
-	shortURL = "http://" + r.Host + getURLPath + shortURL
+	shortURL = baseURL(r) + shortURL
 
 	out, err := json.Marshal(map[string]string{
 		"result": shortURL,
@@ -103,4 +104,11 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 	w.Write(out)
 
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
+}
+
+func baseURL(r *http.Request) string {
+	if configs.BaseURL != "" {
+		return configs.BaseURL
+	}
+	return configs.Protocol + "://" + r.Host + getURLPath
 }
