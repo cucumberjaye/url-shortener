@@ -9,6 +9,9 @@ import (
 
 func main() {
 	logger.New()
-	app := app_.New()
+	app, err := app_.New()
+	if err != nil {
+		logger.ErrorLogger.Fatal(err)
+	}
 	logger.ErrorLogger.Fatal(http.ListenAndServe(configs.ServerAddress, app.Handlers.InitRoutes()))
 }

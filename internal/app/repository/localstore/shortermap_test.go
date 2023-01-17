@@ -1,6 +1,8 @@
 package localstore
 
 import (
+	"github.com/stretchr/testify/require"
+	"os"
 	"sync"
 	"testing"
 )
@@ -37,9 +39,12 @@ func TestDatabase_GetURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			d := &LocalStorage{
-				Store: tt.fields.Store,
-				Exist: map[string]int{},
-				mx:    sync.Mutex{},
+				db: db{
+					Store: tt.fields.Store,
+					Exist: map[string]int{},
+				},
+				fileStore: nil,
+				mx:        sync.Mutex{},
 			}
 			got, err := d.GetURL(tt.args.shortURL)
 			if (err != nil) != tt.wantErr {
@@ -89,9 +94,16 @@ func TestDatabase_SetURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			file, err := os.OpenFile("test.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+			require.NoError(t, err)
+			defer os.Remove("test.txt")
+			defer file.Close()
 			d := &LocalStorage{
-				Store: tt.fields.Store,
-				Exist: tt.fields.Exist,
+				db: db{
+					Store: tt.fields.Store,
+					Exist: tt.fields.Exist,
+				},
+				fileStore: nil,
 			}
 			if err := d.SetURL(tt.args.fullURL, tt.args.shortURL); (err != nil) != tt.wantErr {
 				t.Errorf("SetURL() error = %v, wantErr %v", err, tt.wantErr)

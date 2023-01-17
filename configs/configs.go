@@ -3,9 +3,10 @@ package configs
 import "os"
 
 var (
-	ServerAddress string
-	BaseURL       string
-	Scheme        string
+	ServerAddress   string
+	BaseURL         string
+	Scheme          string
+	FileStoragePath string
 )
 
 const (
@@ -14,17 +15,17 @@ const (
 )
 
 func LoadConfig() {
-	var ok bool
-
-	ServerAddress, ok = os.LookupEnv("SERVER_ADDRESS")
-	if !ok {
-		ServerAddress = defaultServerAddress
-	}
-
+	ServerAddress = lookUpOrSetDefault("SERVER_ADDRESS", defaultServerAddress)
+	Scheme = lookUpOrSetDefault("SCHEME", defaultScheme)
 	BaseURL = os.Getenv("BASE_URL")
+	FileStoragePath = os.Getenv("FILE_STORAGE_PATH")
+}
 
-	Scheme, ok = os.LookupEnv("SCHEME")
+func lookUpOrSetDefault(name, defaultValue string) string {
+	out, ok := os.LookupEnv(name)
 	if !ok {
-		Scheme = defaultScheme
+		return defaultValue
 	}
+
+	return out
 }

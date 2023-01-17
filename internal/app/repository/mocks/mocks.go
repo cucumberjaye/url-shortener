@@ -20,3 +20,7 @@ func (r *RepositoryMock) GetURL(shortURL string) (string, error) {
 	}
 	return "", errors.New("test")
 }
+
+func (r *RepositoryMock) GetURLCount() int64 {
+	return 0
+}

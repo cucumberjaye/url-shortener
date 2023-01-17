@@ -12,12 +12,15 @@ type App struct {
 	Handlers *handler.Handler
 }
 
-func New() *App {
+func New() (*App, error) {
 	configs.LoadConfig()
-	repos := localstore.NewShortenerDB()
+	repos, err := localstore.NewShortenerDB(configs.FileStoragePath)
+	if err != nil {
+		return nil, err
+	}
 	serviceURL := hexshortener.NewShortenerService(repos)
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
 	handlers := handler.NewHandler(serviceURL, logsService)
 	app := &App{Handlers: handlers}
-	return app
+	return app, nil
 }

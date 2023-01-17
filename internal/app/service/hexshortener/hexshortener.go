@@ -12,7 +12,10 @@ type ShortenerService struct {
 }
 
 func NewShortenerService(repos service.URLRepository) *ShortenerService {
-	return &ShortenerService{repos: repos}
+	return &ShortenerService{
+		repos:   repos,
+		counter: repos.GetURLCount(),
+	}
 }
 
 func (s *ShortenerService) ShortingURL(fullURL string) (string, error) {
