@@ -11,8 +11,15 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+	configs.LoadConfig()
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestHandler_Shortener(t *testing.T) {
 	type want struct {
@@ -85,7 +92,6 @@ func TestHandler_Shortener(t *testing.T) {
 
 	logger.New()
 	logger.Discard()
-	configs.LoadConfig()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
 	handlers := NewHandler(URLServices, logsServices)
@@ -155,7 +161,6 @@ func TestHandler_JSONShortener(t *testing.T) {
 
 	logger.New()
 	logger.Discard()
-	configs.LoadConfig()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
 	handlers := NewHandler(URLServices, logsServices)

@@ -1,6 +1,9 @@
 package configs
 
-import "os"
+import (
+	"github.com/cucumberjaye/url-shortener/pkg/flags"
+	"os"
+)
 
 var (
 	ServerAddress   string
@@ -10,15 +13,16 @@ var (
 )
 
 const (
-	defaultServerAddress = "localhost:8080"
-	defaultScheme        = "http"
+	defaultScheme = "http"
 )
 
 func LoadConfig() {
-	ServerAddress = lookUpOrSetDefault("SERVER_ADDRESS", defaultServerAddress)
+	flags.InitFlags()
+
+	ServerAddress = lookUpOrSetDefault("SERVER_ADDRESS", flags.ServerAddress)
 	Scheme = lookUpOrSetDefault("SCHEME", defaultScheme)
-	BaseURL = os.Getenv("BASE_URL")
-	FileStoragePath = os.Getenv("FILE_STORAGE_PATH")
+	BaseURL = lookUpOrSetDefault("BASE_URL", flags.BaseURL)
+	FileStoragePath = lookUpOrSetDefault("FILE_STORAGE_PATH", flags.FileStoragePath)
 }
 
 func lookUpOrSetDefault(name, defaultValue string) string {
