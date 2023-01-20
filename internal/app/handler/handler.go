@@ -33,10 +33,14 @@ func NewHandler(service URLService, logsService LogsInfoService) *Handler {
 func (h *Handler) InitRoutes() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Post("/", h.shortener)
-	r.Get("/{short}", h.getFullURL)
-	r.Route("/api", func(r chi.Router) {
-		r.Post("/shorten", h.JSONShortener)
+	r.With(h.gzipCompress).Get("/{short}", h.getFullURL)
+
+	r.Group(func(r chi.Router) {
+		r.Use(h.gzipDecompress)
+		r.Post("/", h.shortener)
+		r.Route("/api", func(r chi.Router) {
+			r.With(h.gzipDecompress).Post("/shorten", h.JSONShortener)
+		})
 	})
 
 	return r
