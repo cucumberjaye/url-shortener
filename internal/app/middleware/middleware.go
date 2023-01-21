@@ -1,4 +1,4 @@
-package handler
+package middleware
 
 import (
 	"compress/gzip"
@@ -16,7 +16,7 @@ func (w gzipWriter) Write(data []byte) (int, error) {
 	return w.Writer.Write(data)
 }
 
-func (h *Handler) gzipCompress(next http.Handler) http.Handler {
+func GzipCompress(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
 			next.ServeHTTP(w, r)
@@ -35,7 +35,7 @@ func (h *Handler) gzipCompress(next http.Handler) http.Handler {
 	})
 }
 
-func (h *Handler) gzipDecompress(next http.Handler) http.Handler {
+func GzipDecompress(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var reader io.ReadCloser
 

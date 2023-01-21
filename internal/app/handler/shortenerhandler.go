@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 	"io"
 	"net/http"
 	"net/url"
@@ -72,7 +72,7 @@ type JSONInput struct {
 }
 
 func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
-	var input = JSONInput{}
+	var input = &JSONInput{}
 
 	URL := url.URL{
 		Scheme: configs.Scheme,
@@ -80,22 +80,15 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
+	if err := render.DecodeJSON(r.Body, input); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
 		return
 	}
-	if len(body) == 0 {
+
+	if len(input.URL) == 0 {
 		http.Error(w, "body is empty", http.StatusBadRequest)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), "body is empty")
-		return
-	}
-
-	err = json.Unmarshal(body, &input)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s:  %s", r.Method, URL.String(), err.Error())
 		return
 	}
 
@@ -108,18 +101,10 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 	}
 	shortURL = baseURL(r) + shortURL
 
-	out, err := json.Marshal(map[string]string{
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, map[string]string{
 		"result": shortURL,
 	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, URL.String(), fullURL, err.Error())
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	w.Write(out)
 
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
 }

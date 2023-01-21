@@ -1,6 +1,7 @@
 package handler
 
 import (
+	mw "github.com/cucumberjaye/url-shortener/internal/app/middleware"
 	"github.com/go-chi/chi"
 )
 
@@ -33,13 +34,13 @@ func NewHandler(service URLService, logsService LogsInfoService) *Handler {
 func (h *Handler) InitRoutes() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.With(h.gzipCompress).Get("/{short}", h.getFullURL)
+	r.With(mw.GzipCompress).Get("/{short}", h.getFullURL)
 
 	r.Group(func(r chi.Router) {
-		r.Use(h.gzipDecompress)
+		r.Use(mw.GzipDecompress)
 		r.Post("/", h.shortener)
 		r.Route("/api", func(r chi.Router) {
-			r.With(h.gzipDecompress).Post("/shorten", h.JSONShortener)
+			r.With(mw.GzipDecompress).Post("/shorten", h.JSONShortener)
 		})
 	})
 
