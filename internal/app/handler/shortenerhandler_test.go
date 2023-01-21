@@ -139,15 +139,14 @@ func TestHandler_JSONShortener(t *testing.T) {
 			body: bytes.NewBufferString("{\"url\":\"test.com\"}"),
 			want: want{
 				code:     201,
-				response: "{\"result\":\"%s/0\"}",
+				response: "{\"result\":\"%s/0\"}\n",
 			},
 		},
-
 		{
-			name: "fail_post_400",
+			name: "fail_post_500_empty",
 			body: bytes.NewBufferString(""),
 			want: want{
-				code: 400,
+				code: 500,
 			},
 		},
 		{

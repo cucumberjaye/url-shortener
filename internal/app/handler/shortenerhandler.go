@@ -41,17 +41,20 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		Host:   r.Host,
 		Path:   r.URL.Path,
 	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
 		return
 	}
+
 	if len(body) == 0 {
 		http.Error(w, "body is empty", http.StatusBadRequest)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), "body is empty")
 		return
 	}
+
 	fullURL := string(body)
 	shortURL, err := h.Service.ShortingURL(fullURL)
 	if err != nil {
@@ -59,6 +62,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, URL.String(), fullURL, err.Error())
 		return
 	}
+	
 	shortURL = baseURL(r) + shortURL
 
 	w.WriteHeader(http.StatusCreated)
