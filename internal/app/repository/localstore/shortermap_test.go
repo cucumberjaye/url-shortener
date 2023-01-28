@@ -9,7 +9,7 @@ import (
 
 func TestDatabase_GetURL(t *testing.T) {
 	type fields struct {
-		Store map[string]string
+		Store map[int]map[string]string
 	}
 	type args struct {
 		shortURL string
@@ -23,14 +23,14 @@ func TestDatabase_GetURL(t *testing.T) {
 	}{
 		{
 			name:    "ok",
-			fields:  fields{Store: map[string]string{"0": "test.com"}},
+			fields:  fields{Store: map[int]map[string]string{0: {"0": "test.com"}}},
 			args:    args{shortURL: "0"},
 			want:    "test.com",
 			wantErr: false,
 		},
 		{
 			name:    "error",
-			fields:  fields{Store: map[string]string{}},
+			fields:  fields{Store: map[int]map[string]string{}},
 			args:    args{shortURL: "0"},
 			want:    "",
 			wantErr: true,
@@ -39,14 +39,14 @@ func TestDatabase_GetURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			d := &LocalStorage{
-				db: db{
+				users: db{
 					Store: tt.fields.Store,
-					Exist: map[string]int{},
+					Exist: map[int]map[string]int{0: {}},
 				},
 				fileStore: nil,
 				mx:        sync.Mutex{},
 			}
-			got, err := d.GetURL(tt.args.shortURL)
+			got, err := d.GetURL(tt.args.shortURL, 0)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetURL() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -60,8 +60,8 @@ func TestDatabase_GetURL(t *testing.T) {
 
 func TestDatabase_SetURL(t *testing.T) {
 	type fields struct {
-		Store map[string]string
-		Exist map[string]int
+		Store map[int]map[string]string
+		Exist map[int]map[string]int
 	}
 	type args struct {
 		fullURL  string
@@ -76,8 +76,8 @@ func TestDatabase_SetURL(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				Store: map[string]string{},
-				Exist: map[string]int{},
+				Store: map[int]map[string]string{},
+				Exist: map[int]map[string]int{},
 			},
 			args:    args{shortURL: "0", fullURL: "test.com"},
 			wantErr: false,
@@ -85,8 +85,8 @@ func TestDatabase_SetURL(t *testing.T) {
 		{
 			name: "error",
 			fields: fields{
-				Store: map[string]string{"0": "test.com"},
-				Exist: map[string]int{"test.com": 0},
+				Store: map[int]map[string]string{0: {"0": "test.com"}},
+				Exist: map[int]map[string]int{0: {"test.com": 0}},
 			},
 			args:    args{shortURL: "0", fullURL: "test.com"},
 			wantErr: true,
@@ -99,13 +99,13 @@ func TestDatabase_SetURL(t *testing.T) {
 			defer os.Remove("test.txt")
 			defer file.Close()
 			d := &LocalStorage{
-				db: db{
+				users: db{
 					Store: tt.fields.Store,
 					Exist: tt.fields.Exist,
 				},
 				fileStore: nil,
 			}
-			if err := d.SetURL(tt.args.fullURL, tt.args.shortURL); (err != nil) != tt.wantErr {
+			if err := d.SetURL(tt.args.fullURL, tt.args.shortURL, 0); (err != nil) != tt.wantErr {
 				t.Errorf("SetURL() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

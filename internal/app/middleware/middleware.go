@@ -37,7 +37,7 @@ func GzipCompress(next http.Handler) http.Handler {
 
 func GzipDecompress(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var reader io.ReadCloser
+		var reader io.Reader
 
 		if strings.Contains(r.Header.Get("Content-Encoding"), "gzip") {
 			gz, err := gzip.NewReader(r.Body)
@@ -51,7 +51,7 @@ func GzipDecompress(next http.Handler) http.Handler {
 			reader = r.Body
 		}
 
-		r.Body = reader
+		r.Body = io.NopCloser(reader)
 
 		next.ServeHTTP(w, r)
 	})

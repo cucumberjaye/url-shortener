@@ -32,7 +32,7 @@ func TestShortenerService_GetFullURL(t *testing.T) {
 	services := NewShortenerService(repos)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := services.GetFullURL(tt.args.shortURL)
+			got, err := services.GetFullURL(tt.args.shortURL, 0)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetFullURL() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -68,7 +68,7 @@ func TestShortenerService_ShortingURL(t *testing.T) {
 	services := NewShortenerService(repos)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := services.ShortingURL(tt.args.fullURL)
+			_, err := services.ShortingURL(tt.args.fullURL, "", 0)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ShortingURL() error = %v, wantErr %v", err, tt.wantErr)
 				return

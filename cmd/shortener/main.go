@@ -8,12 +8,12 @@ import (
 func main() {
 	logger.New()
 
-	a, err := app.New()
+	shortener, err := app.New()
 	if err != nil {
 		logger.ErrorLogger.Fatal(err)
 	}
 
-	err = a.Run()
+	err = shortener.Run()
 	if err != nil {
 		logger.ErrorLogger.Fatal(err)
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
+	"github.com/cucumberjaye/url-shortener/internal/app/service/auth"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/shortenerlogsinfo"
 	"github.com/go-chi/chi"
@@ -25,8 +26,9 @@ func New() (*App, error) {
 
 	serviceURL := hexshortener.NewShortenerService(repos)
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
+	authService := auth.New()
 
-	handlers := handler.NewHandler(serviceURL, logsService)
+	handlers := handler.NewHandler(serviceURL, logsService, authService)
 
 	mux := chi.NewMux()
 	mux.Mount("/", handlers.InitRoutes())

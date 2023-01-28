@@ -2,8 +2,8 @@ package handler
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/cucumberjaye/url-shortener/configs"
+	"github.com/cucumberjaye/url-shortener/internal/app/service/auth"
 	mocks2 "github.com/cucumberjaye/url-shortener/internal/app/service/mocks"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/stretchr/testify/assert"
@@ -49,7 +49,7 @@ func TestHandler_Shortener(t *testing.T) {
 			way:    "/",
 			want: want{
 				code:     201,
-				response: "/0",
+				response: "0",
 			},
 		},
 		{
@@ -94,7 +94,8 @@ func TestHandler_Shortener(t *testing.T) {
 	logger.Discard()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
-	handlers := NewHandler(URLServices, logsServices)
+	authService := auth.New()
+	handlers := NewHandler(URLServices, logsServices, authService)
 
 	r := handlers.InitRoutes()
 	ts := httptest.NewServer(r)
@@ -118,7 +119,7 @@ func TestHandler_Shortener(t *testing.T) {
 			if tt.method == http.MethodPost && tt.want.code == 201 {
 				resBody, err := io.ReadAll(resp.Body)
 				require.NoError(t, err)
-				assert.Equal(t, ts.URL+tt.want.response, string(resBody))
+				assert.Equal(t, tt.want.response, string(resBody))
 			}
 		})
 	}
@@ -139,7 +140,7 @@ func TestHandler_JSONShortener(t *testing.T) {
 			body: bytes.NewBufferString("{\"url\":\"test.com\"}"),
 			want: want{
 				code:     201,
-				response: "{\"result\":\"%s/0\"}\n",
+				response: "{\"result\":\"0\"}\n",
 			},
 		},
 		{
@@ -162,7 +163,8 @@ func TestHandler_JSONShortener(t *testing.T) {
 	logger.Discard()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
-	handlers := NewHandler(URLServices, logsServices)
+	authService := auth.New()
+	handlers := NewHandler(URLServices, logsServices, authService)
 
 	r := handlers.InitRoutes()
 	ts := httptest.NewServer(r)
@@ -183,7 +185,7 @@ func TestHandler_JSONShortener(t *testing.T) {
 			if tt.want.code == 201 {
 				resBody, err := io.ReadAll(resp.Body)
 				require.NoError(t, err)
-				assert.Equal(t, fmt.Sprintf(tt.want.response, ts.URL), string(resBody))
+				assert.Equal(t, tt.want.response, string(resBody))
 			}
 		})
 	}

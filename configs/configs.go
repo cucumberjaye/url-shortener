@@ -10,10 +10,12 @@ var (
 	BaseURL         string
 	Scheme          string
 	FileStoragePath string
+	SigningKey      string
 )
 
 const (
-	defaultScheme = "http"
+	defaultScheme     = "http"
+	defaultSigningKey = "qwerty1234"
 )
 
 func LoadConfig() {
@@ -23,6 +25,7 @@ func LoadConfig() {
 	Scheme = lookUpOrSetDefault("SCHEME", defaultScheme)
 	BaseURL = lookUpOrSetDefault("BASE_URL", flags.BaseURL)
 	FileStoragePath = lookUpOrSetDefault("FILE_STORAGE_PATH", flags.FileStoragePath)
+	SigningKey = lookUpOrSetDefault("SIGNING_KEY", defaultSigningKey)
 }
 
 func lookUpOrSetDefault(name, defaultValue string) string {

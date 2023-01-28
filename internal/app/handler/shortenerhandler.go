@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/cucumberjaye/url-shortener/configs"
+	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
@@ -17,8 +20,11 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
+	id := h.AuthService.GetCurrentId()
+
 	short := chi.URLParam(r, "short")
-	fullURL, err := h.Service.GetFullURL(short)
+	short = baseURL(r) + short
+	fullURL, err := h.Service.GetFullURL(short, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, shortURL.String(), err.Error())
@@ -27,7 +33,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", fullURL)
 	w.WriteHeader(307)
 
-	requestCount, err := h.LoggerService.GetRequestCount(short)
+	requestCount, err := h.LoggerService.GetRequestCount(short, id)
 	if err != nil {
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, shortURL.String(), err.Error())
 		return
@@ -55,15 +61,17 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id := h.AuthService.GetCurrentId()
+
 	fullURL := string(body)
-	shortURL, err := h.Service.ShortingURL(fullURL)
+	fullURL = strings.Trim(fullURL, "\n")
+	fmt.Println(fullURL)
+	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, URL.String(), fullURL, err.Error())
 		return
 	}
-	
-	shortURL = baseURL(r) + shortURL
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(shortURL))
@@ -75,7 +83,7 @@ type JSONInput struct {
 	URL string `json:"url"`
 }
 
-func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 	var input = &JSONInput{}
 
 	URL := url.URL{
@@ -96,14 +104,15 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	id := h.AuthService.GetCurrentId()
+
 	fullURL := input.URL
-	shortURL, err := h.Service.ShortingURL(fullURL)
+	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, URL.String(), fullURL, err.Error())
 		return
 	}
-	shortURL = baseURL(r) + shortURL
 
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, map[string]string{
@@ -111,6 +120,16 @@ func (h *Handler) JSONShortener(w http.ResponseWriter, r *http.Request) {
 	})
 
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
+}
+
+func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
+	var out []models.URLs
+
+	id := h.AuthService.GetCurrentId()
+	out = h.Service.GetAllUserURL(id)
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, out)
 }
 
 func baseURL(r *http.Request) string {
