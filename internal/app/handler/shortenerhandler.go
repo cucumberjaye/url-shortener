@@ -20,7 +20,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	id := h.AuthService.GetCurrentId()
+	id := h.AuthService.GetCurrentID()
 
 	short := chi.URLParam(r, "short")
 	short = baseURL(r) + short
@@ -61,7 +61,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.AuthService.GetCurrentId()
+	id := h.AuthService.GetCurrentID()
 
 	fullURL := string(body)
 	fullURL = strings.Trim(fullURL, "\n")
@@ -104,7 +104,7 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.AuthService.GetCurrentId()
+	id := h.AuthService.GetCurrentID()
 
 	fullURL := input.URL
 	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
@@ -125,8 +125,13 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 	var out []models.URLs
 
-	id := h.AuthService.GetCurrentId()
+	id := h.AuthService.GetCurrentID()
 	out = h.Service.GetAllUserURL(id)
+
+	if len(out) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, out)

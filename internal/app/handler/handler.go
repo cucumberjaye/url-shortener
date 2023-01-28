@@ -24,8 +24,8 @@ type URLService interface {
 type AuthService interface {
 	GenerateNewToken() (string, error)
 	CheckToken(token string) (int, error)
-	SetCurrentId(id int)
-	GetCurrentId() int
+	SetCurrentID(id int)
+	GetCurrentID() int
 }
 
 type Handler struct {

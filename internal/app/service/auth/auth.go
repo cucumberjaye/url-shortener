@@ -11,14 +11,14 @@ import (
 )
 
 type AuthService struct {
-	currentId int
-	lastId    int
+	currentID int
+	lastID    int
 }
 
 func New() *AuthService {
 	return &AuthService{
-		currentId: 0,
-		lastId:    0,
+		currentID: 0,
+		lastID:    0,
 	}
 }
 
@@ -35,11 +35,11 @@ func (s *AuthService) GenerateNewToken() (string, error) {
 		return "", err
 	}
 
-	strId := fmt.Sprintf("%d", s.lastId)
-	s.currentId = s.lastId
-	s.lastId++
+	strID := fmt.Sprintf("%d", s.lastID)
+	s.currentID = s.lastID
+	s.lastID++
 
-	enc := aesgcm.Seal(nil, key[:12], []byte(strId), nil)
+	enc := aesgcm.Seal(nil, key[:12], []byte(strID), nil)
 
 	return hex.EncodeToString(enc), nil
 }
@@ -70,10 +70,10 @@ func (s *AuthService) CheckToken(token string) (int, error) {
 	return strconv.Atoi(string(dec))
 }
 
-func (s *AuthService) SetCurrentId(id int) {
-	s.currentId = id
+func (s *AuthService) SetCurrentID(id int) {
+	s.currentID = id
 }
 
-func (s *AuthService) GetCurrentId() int {
-	return s.currentId
+func (s *AuthService) GetCurrentID() int {
+	return s.currentID
 }

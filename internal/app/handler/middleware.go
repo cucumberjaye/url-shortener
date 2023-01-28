@@ -12,7 +12,7 @@ func (h *Handler) authentication(next http.Handler) http.Handler {
 		if err == nil {
 			id, err := h.AuthService.CheckToken(c.Value)
 			if err == nil {
-				h.AuthService.SetCurrentId(id)
+				h.AuthService.SetCurrentID(id)
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -27,6 +27,7 @@ func (h *Handler) authentication(next http.Handler) http.Handler {
 			Name:    "authorization",
 			Value:   token,
 			Expires: time.Now().Add(30 * 24 * time.Hour),
+			Path:    "/",
 		})
 		next.ServeHTTP(w, r)
 	})
