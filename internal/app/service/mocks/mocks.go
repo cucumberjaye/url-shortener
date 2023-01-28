@@ -15,7 +15,7 @@ func (m *ServiceMock) ShortingURL(fullURL, baseURL string, id int) (string, erro
 	return "", errors.New("test")
 }
 
-func (m *ServiceMock) GetFullURL(shortURL string, id int) (string, error) {
+func (m *ServiceMock) GetFullURL(shortURL string) (string, error) {
 	if shortURL[len(shortURL)-1] == '0' {
 		return "test.com", nil
 	}

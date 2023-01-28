@@ -12,12 +12,12 @@ const (
 )
 
 type LogsInfoService interface {
-	GetRequestCount(shortURL string, id int) (int, error)
+	GetRequestCount(shortURL string) (int, error)
 }
 
 type URLService interface {
 	ShortingURL(fullURL, baseURL string, id int) (string, error)
-	GetFullURL(shortURL string, id int) (string, error)
+	GetFullURL(shortURL string) (string, error)
 	GetAllUserURL(id int) []models.URLs
 }
 

@@ -12,8 +12,8 @@ func NewURLLogsInfo(repos service.LogsInfoRepository) *URLLogsInfo {
 	return &URLLogsInfo{repos: repos}
 }
 
-func (s *URLLogsInfo) GetRequestCount(shortURL string, id int) (int, error) {
-	count, err := s.repos.GetRequestCount(shortURL, id)
+func (s *URLLogsInfo) GetRequestCount(shortURL string) (int, error) {
+	count, err := s.repos.GetRequestCount(shortURL)
 	if err != nil {
 		return 0, err
 	}

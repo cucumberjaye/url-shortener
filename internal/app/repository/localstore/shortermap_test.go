@@ -46,7 +46,7 @@ func TestDatabase_GetURL(t *testing.T) {
 				fileStore: nil,
 				mx:        sync.Mutex{},
 			}
-			got, err := d.GetURL(tt.args.shortURL, 0)
+			got, err := d.GetURL(tt.args.shortURL)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetURL() error = %v, wantErr %v", err, tt.wantErr)
 				return

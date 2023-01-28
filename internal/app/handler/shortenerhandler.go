@@ -20,11 +20,9 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	id := h.AuthService.GetCurrentID()
-
 	short := chi.URLParam(r, "short")
 	short = baseURL(r) + short
-	fullURL, err := h.Service.GetFullURL(short, id)
+	fullURL, err := h.Service.GetFullURL(short)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, shortURL.String(), err.Error())
@@ -33,7 +31,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", fullURL)
 	w.WriteHeader(307)
 
-	requestCount, err := h.LoggerService.GetRequestCount(short, id)
+	requestCount, err := h.LoggerService.GetRequestCount(short)
 	if err != nil {
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, shortURL.String(), err.Error())
 		return

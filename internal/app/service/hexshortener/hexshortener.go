@@ -5,11 +5,12 @@ import (
 	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/cucumberjaye/url-shortener/models"
 	"sync"
+	"sync/atomic"
 )
 
 type ShortenerService struct {
 	repos   service.URLRepository
-	counter map[int]int
+	counter int64
 	mx      sync.Mutex
 }
 
@@ -21,19 +22,17 @@ func NewShortenerService(repos service.URLRepository) *ShortenerService {
 }
 
 func (s *ShortenerService) ShortingURL(fullURL, baseURL string, id int) (string, error) {
-	shortURL := baseURL + fmt.Sprintf("%x", s.counter[id])
+	shortURL := baseURL + fmt.Sprintf("%x", s.counter)
 	if err := s.repos.SetURL(fullURL, shortURL, id); err != nil {
 		return "", err
 	}
-	s.mx.Lock()
-	s.counter[id]++
-	s.mx.Unlock()
+	atomic.AddInt64(&s.counter, 1)
 
 	return shortURL, nil
 }
 
-func (s *ShortenerService) GetFullURL(shortURL string, id int) (string, error) {
-	fullURL, err := s.repos.GetURL(shortURL, id)
+func (s *ShortenerService) GetFullURL(shortURL string) (string, error) {
+	fullURL, err := s.repos.GetURL(shortURL)
 	if err != nil {
 		return "", err
 	}

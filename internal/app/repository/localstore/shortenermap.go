@@ -83,50 +83,55 @@ func (d *LocalStorage) SetURL(fullURL, shortURL string, id int) error {
 	return nil
 }
 
-func (d *LocalStorage) GetURL(shortURL string, id int) (string, error) {
+func (d *LocalStorage) GetURL(shortURL string) (string, error) {
 	var url string
 	d.mx.Lock()
 	defer d.mx.Unlock()
-	if u, ok := d.users.Store[id]; !ok {
-		return "", errors.New("url is not exist")
-	} else {
-		if url, ok = u[shortURL]; !ok {
-			return "", errors.New("url is not exist")
-		}
-	}
-	d.users.Exist[id][url]++
-	if d.fileStore != nil {
-		if err := d.fileStore.encoder.Encode(&d.users); err != nil {
-			return url, err
+	for id, s := range d.users.Store {
+		for k, v := range s {
+			if k == shortURL {
+				url = v
+				d.users.Exist[id][url]++
+				if d.fileStore != nil {
+					if err := d.fileStore.encoder.Encode(&d.users); err != nil {
+						return url, err
+					}
+				}
+				return url, nil
+			}
 		}
 	}
 
-	return url, nil
+	return url, errors.New("url is not exist")
 }
 
-func (d *LocalStorage) GetRequestCount(shortURL string, id int) (int, error) {
+func (d *LocalStorage) GetRequestCount(shortURL string) (int, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
-	if url, ok := d.users.Store[id][shortURL]; !ok {
-		return 0, errors.New("url is not exist")
-	} else {
-		return d.users.Exist[id][url], nil
+
+	for id, s := range d.users.Store {
+		for k, v := range s {
+			if k == shortURL {
+				return d.users.Exist[id][v], nil
+			}
+		}
 	}
+	return 0, errors.New("url is not exist")
 }
 
-func (d *LocalStorage) GetURLCount() map[int]int {
-	var out = map[int]int{}
+func (d *LocalStorage) GetURLCount() int64 {
+	var out int
 
 	d.mx.Lock()
 	defer d.mx.Unlock()
-	for k, v := range d.users.Store {
-		out[k] = len(v)
-		if out[k] > 0 {
-			out[k]++
+	for _, v := range d.users.Store {
+		out += len(v)
+		if out > 0 {
+			out++
 		}
 	}
 
-	return out
+	return int64(out)
 }
 
 func (d *LocalStorage) GetAllUserURL(id int) []models.URLs {

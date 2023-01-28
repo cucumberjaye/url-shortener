@@ -5,12 +5,12 @@ import (
 )
 
 type LogsInfoRepository interface {
-	GetRequestCount(shortURL string, id int) (int, error)
+	GetRequestCount(shortURL string) (int, error)
 }
 
 type URLRepository interface {
 	SetURL(fullURL, shortURL string, id int) error
-	GetURL(shortURL string, id int) (string, error)
-	GetURLCount() map[int]int
+	GetURL(shortURL string) (string, error)
+	GetURLCount() int64
 	GetAllUserURL(id int) []models.URLs
 }
