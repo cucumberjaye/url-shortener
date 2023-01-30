@@ -11,6 +11,7 @@ var (
 	Scheme          string
 	FileStoragePath string
 	SigningKey      string
+	DataBaseDSN     string
 )
 
 const (
@@ -26,6 +27,7 @@ func LoadConfig() {
 	BaseURL = lookUpOrSetDefault("BASE_URL", flags.BaseURL)
 	FileStoragePath = lookUpOrSetDefault("FILE_STORAGE_PATH", flags.FileStoragePath)
 	SigningKey = lookUpOrSetDefault("SIGNING_KEY", defaultSigningKey)
+	DataBaseDSN = lookUpOrSetDefault("DATABASE_DSN", flags.DataBaseDSN)
 }
 
 func lookUpOrSetDefault(name, defaultValue string) string {

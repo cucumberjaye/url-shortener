@@ -25,3 +25,7 @@ func (m *ServiceMock) GetFullURL(shortURL string) (string, error) {
 func (m *ServiceMock) GetAllUserURL(id int) []models.URLs {
 	return []models.URLs{}
 }
+
+func (m *ServiceMock) CheckDBConn() error {
+	return nil
+}

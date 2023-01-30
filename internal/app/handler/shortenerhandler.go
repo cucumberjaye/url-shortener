@@ -135,6 +135,23 @@ func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, out)
 }
 
+func (h *Handler) checkDBConn(w http.ResponseWriter, r *http.Request) {
+	URL := url.URL{
+		Scheme: configs.Scheme,
+		Host:   r.Host,
+		Path:   r.URL.Path,
+	}
+
+	err := h.Service.CheckDBConn()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.WarningLogger.Printf("%s %s %s  ", r.Method, URL.String(), err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func baseURL(r *http.Request) string {
 	if configs.BaseURL != "" {
 		return configs.BaseURL + "/"

@@ -2,6 +2,7 @@ package hexshortener
 
 import (
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/mocks"
+	"github.com/golang/mock/gomock"
 	"testing"
 )
 
@@ -29,7 +30,10 @@ func TestShortenerService_GetFullURL(t *testing.T) {
 		},
 	}
 	repos := &mocks.RepositoryMock{}
-	services := NewShortenerService(repos)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	rSQL := mocks.NewMockSQLRepository(ctrl)
+	services := NewShortenerService(repos, rSQL)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := services.GetFullURL(tt.args.shortURL)
@@ -65,7 +69,10 @@ func TestShortenerService_ShortingURL(t *testing.T) {
 		},
 	}
 	repos := &mocks.RepositoryMock{}
-	services := NewShortenerService(repos)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	rSQL := mocks.NewMockSQLRepository(ctrl)
+	services := NewShortenerService(repos, rSQL)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := services.ShortingURL(tt.args.fullURL, "", 0)

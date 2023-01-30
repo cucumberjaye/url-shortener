@@ -5,9 +5,11 @@ import (
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
+	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgres"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/auth"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/shortenerlogsinfo"
+	"github.com/cucumberjaye/url-shortener/pkg/postgres"
 	"github.com/go-chi/chi"
 	"net/http"
 )
@@ -24,7 +26,12 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	serviceURL := hexshortener.NewShortenerService(repos)
+	pSQL, err := postgres.New()
+	if err != nil {
+		return nil, err
+	}
+	serviceSQL := ps.New(pSQL)
+	serviceURL := hexshortener.NewShortenerService(repos, serviceSQL)
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
 	authService := auth.New()
 

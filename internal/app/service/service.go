@@ -14,3 +14,7 @@ type URLRepository interface {
 	GetURLCount() int64
 	GetAllUserURL(id int) []models.URLs
 }
+
+type SQLRepository interface {
+	CheckDBConn() error
+}

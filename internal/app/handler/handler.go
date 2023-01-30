@@ -19,6 +19,7 @@ type URLService interface {
 	ShortingURL(fullURL, baseURL string, id int) (string, error)
 	GetFullURL(shortURL string) (string, error)
 	GetAllUserURL(id int) []models.URLs
+	CheckDBConn() error
 }
 
 type AuthService interface {
@@ -45,10 +46,10 @@ func NewHandler(service URLService, logsService LogsInfoService, authService Aut
 func (h *Handler) InitRoutes() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Use(h.authentication)
-	r.With(mw.GzipCompress).Get("/{short}", h.getFullURL)
+	r.With(mw.GzipCompress, h.authentication).Get("/{short}", h.getFullURL)
 
-	r.Group(func(r chi.Router) {
+	r.Get("/ping", h.checkDBConn)
+	r.With(h.authentication).Group(func(r chi.Router) {
 		r.Use(mw.GzipDecompress)
 		r.Post("/", h.shortener)
 		r.Route("/api", func(r chi.Router) {
