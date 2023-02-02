@@ -34,6 +34,20 @@ func (m *MockURLRepository) EXPECT() *MockURLRepositoryMockRecorder {
 	return m.recorder
 }
 
+// CheckDBConn mocks base method.
+func (m *MockURLRepository) CheckDBConn() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckDBConn")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckDBConn indicates an expected call of CheckDBConn.
+func (mr *MockURLRepositoryMockRecorder) CheckDBConn() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckDBConn", reflect.TypeOf((*MockURLRepository)(nil).CheckDBConn))
+}
+
 // GetAllUserURL mocks base method.
 func (m *MockURLRepository) GetAllUserURL(arg0 int) ([]models.URLs, error) {
 	m.ctrl.T.Helper()

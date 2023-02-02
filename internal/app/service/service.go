@@ -13,9 +13,6 @@ type URLRepository interface {
 	GetURL(shortURL string) (string, error)
 	GetURLCount() (int64, error)
 	GetAllUserURL(id int) ([]models.URLs, error)
-}
-
-type SQLRepository interface {
 	CheckDBConn() error
 }
 

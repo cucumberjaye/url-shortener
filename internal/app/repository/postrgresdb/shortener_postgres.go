@@ -148,3 +148,7 @@ func (r *SQLStore) GetRequestCount(shortURL string) (int, error) {
 
 	return count, nil
 }
+
+func (r *SQLStore) CheckDBConn() error {
+	return r.db.Ping()
+}

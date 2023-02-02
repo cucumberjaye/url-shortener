@@ -10,19 +10,17 @@ import (
 
 type ShortenerService struct {
 	repos   service.URLRepository
-	rSQL    service.SQLRepository
 	counter int64
 	mx      sync.Mutex
 }
 
-func NewShortenerService(repos service.URLRepository, rSQL service.SQLRepository) (*ShortenerService, error) {
+func NewShortenerService(repos service.URLRepository) (*ShortenerService, error) {
 	c, err := repos.GetURLCount()
 	if err != nil {
 		return nil, err
 	}
 	return &ShortenerService{
 		repos:   repos,
-		rSQL:    rSQL,
 		counter: c,
 	}, nil
 }
@@ -51,5 +49,5 @@ func (s *ShortenerService) GetAllUserURL(id int) ([]models.URLs, error) {
 }
 
 func (s *ShortenerService) CheckDBConn() error {
-	return s.rSQL.CheckDBConn()
+	return s.repos.CheckDBConn()
 }

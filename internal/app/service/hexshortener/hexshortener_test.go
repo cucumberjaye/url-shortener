@@ -37,10 +37,9 @@ func TestShortenerService_GetFullURL(t *testing.T) {
 	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	ping := mocks.NewMockSQLRepository(ctrl)
 	pgs := mocks.NewMockURLRepository(ctrl)
 	pgs.EXPECT().GetURLCount().Return(int64(0), nil)
-	services, err := NewShortenerService(pgs, ping)
+	services, err := NewShortenerService(pgs)
 	require.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -82,10 +81,9 @@ func TestShortenerService_ShortingURL(t *testing.T) {
 	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	ping := mocks.NewMockSQLRepository(ctrl)
 	pgs := mocks.NewMockURLRepository(ctrl)
 	pgs.EXPECT().GetURLCount().Return(int64(0), nil)
-	services, err := NewShortenerService(pgs, ping)
+	services, err := NewShortenerService(pgs)
 	require.NoError(t, err)
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

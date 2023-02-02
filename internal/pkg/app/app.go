@@ -22,14 +22,14 @@ type App struct {
 func New() (*App, error) {
 	configs.LoadConfig()
 
-	pSQL, err := postgres.New()
-	if err != nil {
-		return nil, err
-	}
-
 	var repos service.URLLogs
+	var err error
 
 	if configs.DataBaseDSN != "" {
+		pSQL, err := postgres.New()
+		if err != nil {
+			return nil, err
+		}
 		repos = ps.NewSQLStore(pSQL)
 	} else {
 		repos, err = localstore.NewShortenerDB(configs.FileStoragePath)
@@ -37,9 +37,7 @@ func New() (*App, error) {
 			return nil, err
 		}
 	}
-
-	servicePing := ps.New(pSQL)
-	serviceURL, err := hexshortener.NewShortenerService(repos, servicePing)
+	serviceURL, err := hexshortener.NewShortenerService(repos)
 	if err != nil {
 		return nil, err
 	}

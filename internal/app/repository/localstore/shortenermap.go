@@ -146,3 +146,7 @@ func (d *LocalStorage) GetAllUserURL(id int) ([]models.URLs, error) {
 
 	return out, nil
 }
+
+func (d *LocalStorage) CheckDBConn() error {
+	return nil
+}
