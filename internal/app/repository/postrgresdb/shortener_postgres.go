@@ -18,16 +18,19 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (r *SQLStore) SetURL(fullURL, shortURL string, id int) error {
-	selectQuery := "SELECT short_url FROM urls WHERE short_url=$1"
-	row, err := r.db.Query(selectQuery, shortURL)
+	selectQuery := "SELECT COUNT(*) FROM urls WHERE original_url=$1"
+	row, err := r.db.Query(selectQuery, fullURL)
 	if err != nil {
 		return err
 	}
 	defer row.Close()
-	var short string
+	var count int
 	row.Next()
-	err = row.Scan(&short)
-	if err == sql.ErrNoRows {
+	err = row.Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
 		query := "INSERT INTO urls (user_id, short_url, original_url, uses) values ($1, $2, $3, $4)"
 		_, err = r.db.Exec(query, id, shortURL, fullURL, 0)
 		if err != nil {
