@@ -30,6 +30,9 @@ func (r *SQLStore) SetURL(fullURL, shortURL string, id int) error {
 	if err == sql.ErrNoRows {
 		query := "INSERT INTO urls (user_id, short_url, original_url, uses) values ($1, $2, $3, $4)"
 		_, err = r.db.Exec(query, id, shortURL, fullURL, 0)
+		if err != nil {
+			return err
+		}
 	} else {
 		return errors.New("url already exists")
 	}

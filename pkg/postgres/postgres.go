@@ -3,9 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"github.com/cucumberjaye/url-shortener/configs"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	_ "github.com/mattes/migrate/source/file"
 )
 
 func New() (*sql.DB, error) {
