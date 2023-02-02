@@ -87,12 +87,10 @@ func TestShortenerService_ShortingURL(t *testing.T) {
 	pgs.EXPECT().GetURLCount().Return(int64(0), nil)
 	services, err := NewShortenerService(pgs, ping)
 	require.NoError(t, err)
-	var short = 0
-	for _, tt := range tests {
+	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			pgs.EXPECT().SetURL(tt.args.fullURL, fmt.Sprintf("%d", short), 0).Return(tt.want)
-			short++
+			pgs.EXPECT().SetURL(tt.args.fullURL, fmt.Sprintf("%d", i), 0).Return(tt.want)
 			_, err = services.ShortingURL(tt.args.fullURL, "", 0)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ShortingURL() error = %v, wantErr %v", err, tt.wantErr)

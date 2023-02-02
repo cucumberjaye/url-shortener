@@ -51,6 +51,10 @@ func (r *SQLStore) GetURL(shortURL string) (string, error) {
 		}
 	}
 
+	if err = row.Err(); err != nil {
+		return "", err
+	}
+
 	updateQuery := "UPDATE urls SET uses=(SELECT uses FROM urls WHERE short_url=$1)+1 WHERE short_url=$1"
 	_, err = r.db.Exec(updateQuery, shortURL)
 	if err != nil {
@@ -77,6 +81,10 @@ func (r *SQLStore) GetURLCount() (int64, error) {
 		} else if err != nil {
 			return 0, err
 		}
+	}
+
+	if err = row.Err(); err != nil {
+		return 0, err
 	}
 
 	return count, nil
@@ -127,6 +135,10 @@ func (r *SQLStore) GetRequestCount(shortURL string) (int, error) {
 		if err = row.Scan(&count); err != nil {
 			return 0, err
 		}
+	}
+
+	if err = row.Err(); err != nil {
+		return 0, err
 	}
 
 	return count, nil
