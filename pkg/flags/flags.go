@@ -19,7 +19,7 @@ func InitFlags() {
 	flag.StringVar(&ServerAddress, "a", defaultServerAddress, "server address to listen on")
 	flag.StringVar(&BaseURL, "b", "", "base address for get method result")
 	flag.StringVar(&FileStoragePath, "f", "", "file storage path")
-	flag.StringVar(&DataBaseDSN, "d", "postgres://postgres:qwerty1234@localhost:5432/postgres", "database URL")
+	flag.StringVar(&DataBaseDSN, "d", "", "database URL")
 
 	flag.Parse()
 }
