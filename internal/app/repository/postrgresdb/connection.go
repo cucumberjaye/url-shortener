@@ -1,4 +1,4 @@
-package postrgres_db
+package postrgresdb
 
 import "database/sql"
 

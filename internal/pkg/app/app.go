@@ -5,7 +5,7 @@ import (
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
-	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgres_db"
+	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgresdb"
 	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/auth"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"

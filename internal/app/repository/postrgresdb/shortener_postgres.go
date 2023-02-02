@@ -1,4 +1,4 @@
-package postrgres_db
+package postrgresdb
 
 import (
 	"database/sql"
@@ -23,6 +23,7 @@ func (r *SQLStore) SetURL(fullURL, shortURL string, id int) error {
 	if err != nil {
 		return err
 	}
+	defer row.Close()
 	var short string
 	row.Next()
 	err = row.Scan(&short)
@@ -32,7 +33,8 @@ func (r *SQLStore) SetURL(fullURL, shortURL string, id int) error {
 	} else {
 		return errors.New("url already exists")
 	}
-	return err
+
+	return row.Err()
 }
 
 func (r *SQLStore) GetURL(shortURL string) (string, error) {
