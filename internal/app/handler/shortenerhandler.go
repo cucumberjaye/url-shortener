@@ -123,8 +123,19 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 	var out []models.URLs
 
+	URL := url.URL{
+		Scheme: configs.Scheme,
+		Host:   r.Host,
+		Path:   r.URL.Path,
+	}
+
 	id := h.AuthService.GetCurrentID()
-	out = h.Service.GetAllUserURL(id)
+	out, err := h.Service.GetAllUserURL(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.WarningLogger.Printf("%s  %s  %s", r.Method, URL.String(), err.Error())
+		return
+	}
 
 	if len(out) == 0 {
 		w.WriteHeader(http.StatusNoContent)

@@ -22,8 +22,8 @@ func (m *ServiceMock) GetFullURL(shortURL string) (string, error) {
 	return "", errors.New("test")
 }
 
-func (m *ServiceMock) GetAllUserURL(id int) []models.URLs {
-	return []models.URLs{}
+func (m *ServiceMock) GetAllUserURL(id int) ([]models.URLs, error) {
+	return []models.URLs{}, nil
 }
 
 func (m *ServiceMock) CheckDBConn() error {

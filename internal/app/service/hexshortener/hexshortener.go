@@ -15,12 +15,16 @@ type ShortenerService struct {
 	mx      sync.Mutex
 }
 
-func NewShortenerService(repos service.URLRepository, rSQL service.SQLRepository) *ShortenerService {
+func NewShortenerService(repos service.URLRepository, rSQL service.SQLRepository) (*ShortenerService, error) {
+	c, err := repos.GetURLCount()
+	if err != nil {
+		return nil, err
+	}
 	return &ShortenerService{
 		repos:   repos,
 		rSQL:    rSQL,
-		counter: repos.GetURLCount(),
-	}
+		counter: c,
+	}, nil
 }
 
 func (s *ShortenerService) ShortingURL(fullURL, baseURL string, id int) (string, error) {
@@ -42,7 +46,7 @@ func (s *ShortenerService) GetFullURL(shortURL string) (string, error) {
 	return fullURL, err
 }
 
-func (s *ShortenerService) GetAllUserURL(id int) []models.URLs {
+func (s *ShortenerService) GetAllUserURL(id int) ([]models.URLs, error) {
 	return s.repos.GetAllUserURL(id)
 }
 

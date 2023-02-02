@@ -5,7 +5,8 @@ import (
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
-	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgres"
+	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgres_db"
+	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/auth"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/shortenerlogsinfo"
@@ -21,17 +22,27 @@ type App struct {
 func New() (*App, error) {
 	configs.LoadConfig()
 
-	repos, err := localstore.NewShortenerDB(configs.FileStoragePath)
-	if err != nil {
-		return nil, err
-	}
-
 	pSQL, err := postgres.New()
 	if err != nil {
 		return nil, err
 	}
-	serviceSQL := ps.New(pSQL)
-	serviceURL := hexshortener.NewShortenerService(repos, serviceSQL)
+
+	var repos service.URLLogs
+
+	if configs.DataBaseDSN != "" {
+		repos = ps.NewSQLStore(pSQL)
+	} else {
+		repos, err = localstore.NewShortenerDB(configs.FileStoragePath)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	servicePing := ps.New(pSQL)
+	serviceURL, err := hexshortener.NewShortenerService(repos, servicePing)
+	if err != nil {
+		return nil, err
+	}
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
 	authService := auth.New()
 

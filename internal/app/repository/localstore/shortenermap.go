@@ -119,7 +119,7 @@ func (d *LocalStorage) GetRequestCount(shortURL string) (int, error) {
 	return 0, errors.New("url is not exist")
 }
 
-func (d *LocalStorage) GetURLCount() int64 {
+func (d *LocalStorage) GetURLCount() (int64, error) {
 	var out int
 
 	d.mx.Lock()
@@ -131,10 +131,10 @@ func (d *LocalStorage) GetURLCount() int64 {
 		}
 	}
 
-	return int64(out)
+	return int64(out), nil
 }
 
-func (d *LocalStorage) GetAllUserURL(id int) []models.URLs {
+func (d *LocalStorage) GetAllUserURL(id int) ([]models.URLs, error) {
 	var out = []models.URLs{}
 
 	for k, v := range d.users.Store[id] {
@@ -144,5 +144,5 @@ func (d *LocalStorage) GetAllUserURL(id int) []models.URLs {
 		})
 	}
 
-	return out
+	return out, nil
 }

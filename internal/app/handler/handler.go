@@ -18,7 +18,7 @@ type LogsInfoService interface {
 type URLService interface {
 	ShortingURL(fullURL, baseURL string, id int) (string, error)
 	GetFullURL(shortURL string) (string, error)
-	GetAllUserURL(id int) []models.URLs
+	GetAllUserURL(id int) ([]models.URLs, error)
 	CheckDBConn() error
 }
 
