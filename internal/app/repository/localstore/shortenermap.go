@@ -150,3 +150,30 @@ func (d *LocalStorage) GetAllUserURL(id int) ([]models.URLs, error) {
 func (d *LocalStorage) CheckDBConn() error {
 	return nil
 }
+
+func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []string, id int) ([]models.BatchInputJSON, error) {
+	d.mx.Lock()
+	defer d.mx.Unlock()
+	for i := 0; i < len(data); i++ {
+		if _, ok := d.users.Store[id]; ok {
+			if _, ok := d.users.Exist[id][data[i].OriginalURL]; ok {
+				return nil, errors.New("url already exist")
+			}
+			d.users.Exist[id][data[i].OriginalURL] = 0
+			d.users.Store[id][shortURL[i]] = data[i].OriginalURL
+		} else {
+			d.users.Store[id] = map[string]string{shortURL[i]: data[i].OriginalURL}
+			d.users.Exist[id] = map[string]int{data[i].OriginalURL: 0}
+		}
+
+		data[i].OriginalURL = shortURL[i]
+
+		if d.fileStore != nil {
+			if err := d.fileStore.encoder.Encode(&d.users); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return data, nil
+}

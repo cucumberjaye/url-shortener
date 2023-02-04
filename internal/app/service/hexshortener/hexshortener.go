@@ -51,3 +51,12 @@ func (s *ShortenerService) GetAllUserURL(id int) ([]models.URLs, error) {
 func (s *ShortenerService) CheckDBConn() error {
 	return s.repos.CheckDBConn()
 }
+
+func (s *ShortenerService) BatchSetURL(data []models.BatchInputJSON, baseURL string, id int) ([]models.BatchInputJSON, error) {
+	var shortURL = []string{}
+	for i := 0; i < len(data); i++ {
+		shortURL = append(shortURL, baseURL+fmt.Sprintf("%x", s.counter))
+		atomic.AddInt64(&s.counter, 1)
+	}
+	return s.repos.BatchSetURL(data, shortURL, id)
+}

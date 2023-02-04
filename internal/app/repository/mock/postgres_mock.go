@@ -2,7 +2,7 @@
 // Source: github.com/cucumberjaye/url-shortener/internal/app/service (interfaces: URLRepository)
 
 // Package mock_service is a generated GoMock package.
-package mocks
+package mock_service
 
 import (
 	reflect "reflect"
@@ -32,6 +32,21 @@ func NewMockURLRepository(ctrl *gomock.Controller) *MockURLRepository {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockURLRepository) EXPECT() *MockURLRepositoryMockRecorder {
 	return m.recorder
+}
+
+// BatchSetURL mocks base method.
+func (m *MockURLRepository) BatchSetURL(arg0 []models.BatchInputJSON, arg1 []string, arg2 int) ([]models.BatchInputJSON, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BatchSetURL", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]models.BatchInputJSON)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BatchSetURL indicates an expected call of BatchSetURL.
+func (mr *MockURLRepositoryMockRecorder) BatchSetURL(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchSetURL", reflect.TypeOf((*MockURLRepository)(nil).BatchSetURL), arg0, arg1, arg2)
 }
 
 // CheckDBConn mocks base method.

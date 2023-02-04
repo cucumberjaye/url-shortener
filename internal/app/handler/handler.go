@@ -20,6 +20,7 @@ type URLService interface {
 	GetFullURL(shortURL string) (string, error)
 	GetAllUserURL(id int) ([]models.URLs, error)
 	CheckDBConn() error
+	BatchSetURL(data []models.BatchInputJSON, baseURL string, id int) ([]models.BatchInputJSON, error)
 }
 
 type AuthService interface {
@@ -53,7 +54,10 @@ func (h *Handler) InitRoutes() *chi.Mux {
 		r.Use(mw.GzipDecompress)
 		r.Post("/", h.shortener)
 		r.Route("/api", func(r chi.Router) {
-			r.With(mw.GzipDecompress).Post("/shorten", h.shortenerJSON)
+			r.With(mw.GzipDecompress).Route("/shorten", func(r chi.Router) {
+				r.Post("/", h.shortenerJSON)
+				r.Post("/batch", h.batchShortener)
+			})
 
 			r.Route("/user", func(r chi.Router) {
 				r.Get("/urls", h.getUserURL)

@@ -155,3 +155,51 @@ func (r *SQLStore) GetRequestCount(shortURL string) (int, error) {
 func (r *SQLStore) CheckDBConn() error {
 	return r.db.Ping()
 }
+
+func (r *SQLStore) BatchSetURL(data []models.BatchInputJSON, shortURL []string, id int) ([]models.BatchInputJSON, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	selStmt, err := tx.Prepare("SELECT COUNT(*) FROM urls WHERE original_url=$1")
+	if err != nil {
+		return nil, err
+	}
+	defer selStmt.Close()
+
+	insStmt, err := tx.Prepare("INSERT INTO urls (user_id, short_url, original_url, uses) values ($1, $2, $3, $4)")
+	if err != nil {
+		return nil, err
+	}
+	defer insStmt.Close()
+
+	for i := 0; i < len(data); i++ {
+		row, err := selStmt.Query(data[i].OriginalURL)
+		if err != nil {
+			return nil, err
+		}
+		var count int
+		row.Next()
+		err = row.Scan(&count)
+		if err != nil {
+			return nil, err
+		}
+		row.Close()
+
+		if count == 0 {
+			_, err = insStmt.Exec(id, shortURL[i], data[i].OriginalURL, 0)
+			if err != nil {
+				if err = tx.Rollback(); err != nil {
+					return nil, err
+				}
+			}
+			data[i].OriginalURL = shortURL[i]
+		} else {
+			return nil, errors.New("url already exists")
+		}
+	}
+
+	return data, tx.Commit()
+
+}

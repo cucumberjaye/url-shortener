@@ -163,6 +163,46 @@ func (h *Handler) checkDBConn(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
+	var input []models.BatchInputJSON
+	var out = []models.BatchOutputJSON{}
+
+	URL := url.URL{
+		Scheme: configs.Scheme,
+		Host:   r.Host,
+		Path:   r.URL.Path,
+	}
+
+	if err := render.DecodeJSON(r.Body, &input); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
+		return
+	}
+
+	id := h.AuthService.GetCurrentID()
+	tmp, err := h.Service.BatchSetURL(input, baseURL(r), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
+		return
+	}
+
+	for i := 0; i < len(tmp); i++ {
+		out = append(out, models.BatchOutputJSON{
+			CorrelationId: tmp[i].CorrelationId,
+			ShortURL:      tmp[i].OriginalURL,
+		})
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, out)
+
+	for i := 0; i < len(out); i++ {
+		logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, input[i].OriginalURL, out[i].ShortURL)
+	}
+
+}
+
 func baseURL(r *http.Request) string {
 	if configs.BaseURL != "" {
 		return configs.BaseURL + "/"

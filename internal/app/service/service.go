@@ -14,6 +14,7 @@ type URLRepository interface {
 	GetURLCount() (int64, error)
 	GetAllUserURL(id int) ([]models.URLs, error)
 	CheckDBConn() error
+	BatchSetURL(data []models.BatchInputJSON, shortURL []string, id int) ([]models.BatchInputJSON, error)
 }
 
 type URLLogs interface {

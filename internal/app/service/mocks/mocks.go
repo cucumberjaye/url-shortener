@@ -29,3 +29,7 @@ func (m *ServiceMock) GetAllUserURL(id int) ([]models.URLs, error) {
 func (m *ServiceMock) CheckDBConn() error {
 	return nil
 }
+
+func (m *ServiceMock) BatchSetURL(data []models.BatchInputJSON, baseURL string, id int) ([]models.BatchInputJSON, error) {
+	return []models.BatchInputJSON{}, nil
+}
