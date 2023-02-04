@@ -189,7 +189,7 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < len(tmp); i++ {
 		out = append(out, models.BatchOutputJSON{
-			CorrelationId: tmp[i].CorrelationId,
+			CorrelationID: tmp[i].CorrelationID,
 			ShortURL:      tmp[i].OriginalURL,
 		})
 	}
