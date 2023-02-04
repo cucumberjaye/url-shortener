@@ -1,0 +1,62 @@
+package hexshortener
+
+import (
+	"fmt"
+	"github.com/cucumberjaye/url-shortener/internal/app/service"
+	"github.com/cucumberjaye/url-shortener/models"
+	"sync"
+	"sync/atomic"
+)
+
+type ShortenerService struct {
+	repos   service.URLRepository
+	counter int64
+	mx      sync.Mutex
+}
+
+func NewShortenerService(repos service.URLRepository) (*ShortenerService, error) {
+	c, err := repos.GetURLCount()
+	if err != nil {
+		return nil, err
+	}
+	return &ShortenerService{
+		repos:   repos,
+		counter: c,
+	}, nil
+}
+
+func (s *ShortenerService) ShortingURL(fullURL, baseURL string, id int) (string, error) {
+	shortURL := baseURL + fmt.Sprintf("%x", s.counter)
+	if err := s.repos.SetURL(fullURL, shortURL, id); err != nil {
+		return "", err
+	}
+	atomic.AddInt64(&s.counter, 1)
+
+	return shortURL, nil
+}
+
+func (s *ShortenerService) GetFullURL(shortURL string) (string, error) {
+	fullURL, err := s.repos.GetURL(shortURL)
+	if err != nil {
+		return "", err
+	}
+
+	return fullURL, err
+}
+
+func (s *ShortenerService) GetAllUserURL(id int) ([]models.URLs, error) {
+	return s.repos.GetAllUserURL(id)
+}
+
+func (s *ShortenerService) CheckDBConn() error {
+	return s.repos.CheckDBConn()
+}
+
+func (s *ShortenerService) BatchSetURL(data []models.BatchInputJSON, baseURL string, id int) ([]models.BatchInputJSON, error) {
+	var shortURL = []string{}
+	for i := 0; i < len(data); i++ {
+		shortURL = append(shortURL, baseURL+fmt.Sprintf("%x", s.counter))
+		atomic.AddInt64(&s.counter, 1)
+	}
+	return s.repos.BatchSetURL(data, shortURL, id)
+}
