@@ -185,6 +185,10 @@ func (r *SQLStore) BatchSetURL(data []models.BatchInputJSON, shortURL []string, 
 		if err != nil {
 			return nil, err
 		}
+
+		if err = row.Err(); err != nil {
+			return nil, err
+		}
 		row.Close()
 
 		if count == 0 {
