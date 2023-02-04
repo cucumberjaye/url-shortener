@@ -88,7 +88,7 @@ func TestShortenerService_ShortingURL(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			pgs.EXPECT().SetURL(tt.args.fullURL, fmt.Sprintf("%d", i), 0).Return(tt.want)
+			pgs.EXPECT().SetURL(tt.args.fullURL, fmt.Sprintf("%d", i), 0).Return("", tt.want)
 			_, err = services.ShortingURL(tt.args.fullURL, "", 0)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ShortingURL() error = %v, wantErr %v", err, tt.wantErr)

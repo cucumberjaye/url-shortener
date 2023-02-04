@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
@@ -63,9 +62,12 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 
 	fullURL := string(body)
 	fullURL = strings.Trim(fullURL, "\n")
-	fmt.Println(fullURL)
 	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
-	if err != nil {
+	if err != nil && err.Error() == "url already exists" {
+		w.WriteHeader(http.StatusConflict)
+		w.Write([]byte(shortURL))
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, URL.String(), fullURL, err.Error())
 		return
@@ -106,7 +108,13 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 
 	fullURL := input.URL
 	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
-	if err != nil {
+	if err != nil && err.Error() == "url already exists" {
+		render.Status(r, http.StatusConflict)
+		render.JSON(w, r, map[string]string{
+			"result": shortURL,
+		})
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s:  fullURL: %s %s", r.Method, URL.String(), fullURL, err.Error())
 		return

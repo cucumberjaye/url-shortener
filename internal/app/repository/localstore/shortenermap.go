@@ -60,12 +60,17 @@ func NewShortenerDB(filename string) (*LocalStorage, error) {
 	}, nil
 }
 
-func (d *LocalStorage) SetURL(fullURL, shortURL string, id int) error {
+func (d *LocalStorage) SetURL(fullURL, shortURL string, id int) (string, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
 	if _, ok := d.users.Store[id]; ok {
 		if _, ok := d.users.Exist[id][fullURL]; ok {
-			return errors.New("url already exist")
+			for short, full := range d.users.Store[id] {
+				if full == fullURL {
+					return short, errors.New("url already exist")
+				}
+			}
+
 		}
 		d.users.Exist[id][fullURL] = 0
 		d.users.Store[id][shortURL] = fullURL
@@ -76,11 +81,11 @@ func (d *LocalStorage) SetURL(fullURL, shortURL string, id int) error {
 
 	if d.fileStore != nil {
 		if err := d.fileStore.encoder.Encode(&d.users); err != nil {
-			return err
+			return "", err
 		}
 	}
 
-	return nil
+	return "", nil
 }
 
 func (d *LocalStorage) GetURL(shortURL string) (string, error) {

@@ -105,7 +105,7 @@ func TestDatabase_SetURL(t *testing.T) {
 				},
 				fileStore: nil,
 			}
-			if err := d.SetURL(tt.args.fullURL, tt.args.shortURL, 0); (err != nil) != tt.wantErr {
+			if _, err := d.SetURL(tt.args.fullURL, tt.args.shortURL, 0); (err != nil) != tt.wantErr {
 				t.Errorf("SetURL() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

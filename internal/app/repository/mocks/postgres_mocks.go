@@ -109,11 +109,12 @@ func (mr *MockURLRepositoryMockRecorder) GetURLCount() *gomock.Call {
 }
 
 // SetURL mocks base method.
-func (m *MockURLRepository) SetURL(arg0, arg1 string, arg2 int) error {
+func (m *MockURLRepository) SetURL(arg0, arg1 string, arg2 int) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetURL", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SetURL indicates an expected call of SetURL.

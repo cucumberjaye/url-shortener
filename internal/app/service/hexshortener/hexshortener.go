@@ -27,7 +27,10 @@ func NewShortenerService(repos service.URLRepository) (*ShortenerService, error)
 
 func (s *ShortenerService) ShortingURL(fullURL, baseURL string, id int) (string, error) {
 	shortURL := baseURL + fmt.Sprintf("%x", s.counter)
-	if err := s.repos.SetURL(fullURL, shortURL, id); err != nil {
+	if short, err := s.repos.SetURL(fullURL, shortURL, id); err != nil {
+		if err.Error() == "url already exists" {
+			return short, err
+		}
 		return "", err
 	}
 	atomic.AddInt64(&s.counter, 1)

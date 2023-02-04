@@ -24,7 +24,7 @@ func createTable(db *sql.DB) error {
 	query := `CREATE TABLE IF NOT EXISTS urls (
     	user_id integer not null,
     	short_url varchar(255) not null,
-    	original_url varchar(255) not null,
+    	original_url varchar(255) not null unique,
     	uses integer not null)`
 
 	_, err := db.Exec(query)

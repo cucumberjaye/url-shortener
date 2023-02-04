@@ -17,30 +17,27 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	}
 }
 
-func (r *SQLStore) SetURL(fullURL, shortURL string, id int) error {
-	selectQuery := "SELECT COUNT(*) FROM urls WHERE original_url=$1"
+func (r *SQLStore) SetURL(fullURL, shortURL string, id int) (string, error) {
+	selectQuery := "SELECT short_url FROM urls WHERE original_url=$1"
 	row, err := r.db.Query(selectQuery, fullURL)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer row.Close()
-	var count int
+	var short string
 	row.Next()
-	err = row.Scan(&count)
-	if err != nil {
-		return err
-	}
-	if count == 0 {
+	row.Scan(&short)
+	if short == "" {
 		query := "INSERT INTO urls (user_id, short_url, original_url, uses) values ($1, $2, $3, $4)"
 		_, err = r.db.Exec(query, id, shortURL, fullURL, 0)
 		if err != nil {
-			return err
+			return "", err
 		}
 	} else {
-		return errors.New("url already exists")
+		return short, errors.New("url already exists")
 	}
 
-	return row.Err()
+	return "", row.Err()
 }
 
 func (r *SQLStore) GetURL(shortURL string) (string, error) {

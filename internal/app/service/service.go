@@ -9,7 +9,7 @@ type LogsInfoRepository interface {
 }
 
 type URLRepository interface {
-	SetURL(fullURL, shortURL string, id int) error
+	SetURL(fullURL, shortURL string, id int) (string, error)
 	GetURL(shortURL string) (string, error)
 	GetURLCount() (int64, error)
 	GetAllUserURL(id int) ([]models.URLs, error)
