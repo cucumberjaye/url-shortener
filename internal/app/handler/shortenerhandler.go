@@ -60,7 +60,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("user_id").(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
@@ -111,7 +111,7 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("user_id").(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
@@ -149,7 +149,7 @@ func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("user_id").(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
@@ -205,7 +205,7 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("user_id").(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
