@@ -61,7 +61,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, ok := r.Context().Value("user_id").(mw.UserID)
+	id, ok := r.Context().Value(mw.UserID("user_id")).(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
@@ -70,7 +70,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 
 	fullURL := string(body)
 	fullURL = strings.Trim(fullURL, "\n")
-	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), string(id))
+	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
 	if err != nil && err.Error() == "url already exists" {
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte(shortURL))
@@ -112,7 +112,7 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, ok := r.Context().Value("user_id").(mw.UserID)
+	id, ok := r.Context().Value(mw.UserID("user_id")).(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
@@ -120,7 +120,7 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullURL := input.URL
-	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), string(id))
+	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
 	if err != nil && err.Error() == "url already exists" {
 		render.Status(r, http.StatusConflict)
 		render.JSON(w, r, map[string]string{
@@ -150,14 +150,14 @@ func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	id, ok := r.Context().Value("user_id").(mw.UserID)
+	id, ok := r.Context().Value(mw.UserID("user_id")).(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
 		return
 	}
 
-	out, err := h.Service.GetAllUserURL(string(id))
+	out, err := h.Service.GetAllUserURL(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s  %s", r.Method, URL.String(), err.Error())
@@ -206,14 +206,14 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, ok := r.Context().Value("user_id").(mw.UserID)
+	id, ok := r.Context().Value(mw.UserID("user_id")).(string)
 	if !ok {
 		http.Error(w, "error on server", http.StatusInternalServerError)
 		logger.ErrorLogger.Println("id must be string")
 		return
 	}
 
-	tmp, err := h.Service.BatchSetURL(input, baseURL(r), string(id))
+	tmp, err := h.Service.BatchSetURL(input, baseURL(r), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
