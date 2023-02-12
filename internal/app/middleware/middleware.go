@@ -2,9 +2,15 @@ package middleware
 
 import (
 	"compress/gzip"
+	"context"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/cucumberjaye/url-shortener/pkg/logger"
+	"github.com/cucumberjaye/url-shortener/pkg/token"
 )
 
 type gzipWriter struct {
@@ -54,5 +60,34 @@ func GzipDecompress(next http.Handler) http.Handler {
 		r.Body = io.NopCloser(reader)
 
 		next.ServeHTTP(w, r)
+	})
+}
+
+func Authentication(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, err := r.Cookie("authorization")
+		if err == nil {
+			id, err := token.CheckToken(c.Value)
+			if err == nil {
+				ctx := context.WithValue(r.Context(), "id", id)
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+		}
+		id := uuid.New().String()
+		ctx := context.WithValue(r.Context(), "id", id)
+		authToken, err := token.GenerateNewToken(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logger.ErrorLogger.Println(err.Error())
+			return
+		}
+		http.SetCookie(w, &http.Cookie{
+			Name:    "authorization",
+			Value:   authToken,
+			Expires: time.Now().Add(30 * 24 * time.Hour),
+			Path:    "/",
+		})
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

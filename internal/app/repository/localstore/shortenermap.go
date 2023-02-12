@@ -1,66 +1,40 @@
 package localstore
 
 import (
-	"encoding/json"
 	"errors"
+	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/cucumberjaye/url-shortener/models"
-	"os"
 	"sync"
 )
 
-type db struct {
-	Store map[int]map[string]string `json:"store"`
-	Exist map[int]map[string]int    `json:"exist"`
-}
-
-type fileStore struct {
-	fileStore *os.File
-	encoder   *json.Encoder
-}
-
 type LocalStorage struct {
-	users     db
-	fileStore *fileStore
-	mx        sync.Mutex
+	users  repository.DB
+	keeper repository.Keeper
+	mx     sync.Mutex
 }
 
-func NewShortenerDB(filename string) (*LocalStorage, error) {
-	var fs *fileStore
-
-	users := db{
-		Store: map[int]map[string]string{},
-		Exist: map[int]map[string]int{},
+func NewShortenerDB(keeper repository.Keeper) (*LocalStorage, error) {
+	var users = repository.DB{
+		Store: map[string]map[string]string{},
+		Exist: map[string]map[string]int{},
 	}
+	var err error
 
-	if filename != "" {
-		file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	if keeper != nil {
+		users, err = keeper.GetAllData()
 		if err != nil {
 			return nil, err
-		}
-
-		dec := json.NewDecoder(file)
-
-		for dec.More() {
-			err = dec.Decode(&users)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		fs = &fileStore{
-			fileStore: file,
-			encoder:   json.NewEncoder(file),
 		}
 	}
 
 	return &LocalStorage{
-		users:     users,
-		fileStore: fs,
-		mx:        sync.Mutex{},
+		users:  users,
+		keeper: keeper,
+		mx:     sync.Mutex{},
 	}, nil
 }
 
-func (d *LocalStorage) SetURL(fullURL, shortURL string, id int) (string, error) {
+func (d *LocalStorage) SetURL(fullURL, shortURL string, id string) (string, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
 	if _, ok := d.users.Store[id]; ok {
@@ -79,8 +53,12 @@ func (d *LocalStorage) SetURL(fullURL, shortURL string, id int) (string, error) 
 		d.users.Exist[id] = map[string]int{fullURL: 0}
 	}
 
-	if d.fileStore != nil {
-		if err := d.fileStore.encoder.Encode(&d.users); err != nil {
+	if d.keeper != nil {
+		user := repository.DB{
+			Store: map[string]map[string]string{id: {shortURL: fullURL}},
+			Exist: map[string]map[string]int{id: {fullURL: 0}},
+		}
+		if err := d.keeper.Set(user); err != nil {
 			return "", err
 		}
 	}
@@ -97,8 +75,12 @@ func (d *LocalStorage) GetURL(shortURL string) (string, error) {
 			if k == shortURL {
 				url = v
 				d.users.Exist[id][url]++
-				if d.fileStore != nil {
-					if err := d.fileStore.encoder.Encode(&d.users); err != nil {
+				if d.keeper != nil {
+					user := repository.DB{
+						Store: nil,
+						Exist: map[string]map[string]int{id: {url: d.users.Exist[id][url]}},
+					}
+					if err := d.keeper.Set(user); err != nil {
 						return url, err
 					}
 				}
@@ -139,7 +121,7 @@ func (d *LocalStorage) GetURLCount() (int64, error) {
 	return int64(out), nil
 }
 
-func (d *LocalStorage) GetAllUserURL(id int) ([]models.URLs, error) {
+func (d *LocalStorage) GetAllUserURL(id string) ([]models.URLs, error) {
 	var out = []models.URLs{}
 
 	for k, v := range d.users.Store[id] {
@@ -152,11 +134,7 @@ func (d *LocalStorage) GetAllUserURL(id int) ([]models.URLs, error) {
 	return out, nil
 }
 
-func (d *LocalStorage) CheckDBConn() error {
-	return nil
-}
-
-func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []string, id int) ([]models.BatchInputJSON, error) {
+func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []string, id string) ([]models.BatchInputJSON, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
 	for i := 0; i < len(data); i++ {
@@ -173,12 +151,20 @@ func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []stri
 
 		data[i].OriginalURL = shortURL[i]
 
-		if d.fileStore != nil {
-			if err := d.fileStore.encoder.Encode(&d.users); err != nil {
+		if d.keeper != nil {
+			user := repository.DB{
+				Store: map[string]map[string]string{id: {shortURL[i]: data[i].OriginalURL}},
+				Exist: map[string]map[string]int{id: {data[i].OriginalURL: 0}},
+			}
+			if err := d.keeper.Set(user); err != nil {
 				return nil, err
 			}
 		}
 	}
 
 	return data, nil
+}
+
+func (d *LocalStorage) CheckStorage() error {
+	return d.keeper.CheckKeeper()
 }

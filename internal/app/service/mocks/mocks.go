@@ -8,7 +8,7 @@ import (
 type ServiceMock struct {
 }
 
-func (m *ServiceMock) ShortingURL(fullURL, baseURL string, id int) (string, error) {
+func (m *ServiceMock) ShortingURL(fullURL, baseURL string, id string) (string, error) {
 	if fullURL == "test.com" {
 		return "0", nil
 	}
@@ -22,7 +22,7 @@ func (m *ServiceMock) GetFullURL(shortURL string) (string, error) {
 	return "", errors.New("test")
 }
 
-func (m *ServiceMock) GetAllUserURL(id int) ([]models.URLs, error) {
+func (m *ServiceMock) GetAllUserURL(id string) ([]models.URLs, error) {
 	return []models.URLs{}, nil
 }
 
@@ -30,6 +30,6 @@ func (m *ServiceMock) CheckDBConn() error {
 	return nil
 }
 
-func (m *ServiceMock) BatchSetURL(data []models.BatchInputJSON, baseURL string, id int) ([]models.BatchInputJSON, error) {
+func (m *ServiceMock) BatchSetURL(data []models.BatchInputJSON, baseURL string, id string) ([]models.BatchInputJSON, error) {
 	return []models.BatchInputJSON{}, nil
 }

@@ -1,15 +1,17 @@
 package handler
 
 import (
-	"github.com/cucumberjaye/url-shortener/configs"
-	"github.com/cucumberjaye/url-shortener/models"
-	"github.com/cucumberjaye/url-shortener/pkg/logger"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
+
+	"github.com/cucumberjaye/url-shortener/configs"
+	"github.com/cucumberjaye/url-shortener/models"
+	"github.com/cucumberjaye/url-shortener/pkg/logger"
 )
 
 func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +60,12 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.AuthService.GetCurrentID()
+	id, ok := r.Context().Value("id").(string)
+	if !ok {
+		http.Error(w, "error on server", http.StatusInternalServerError)
+		logger.ErrorLogger.Println("id must be string")
+		return
+	}
 
 	fullURL := string(body)
 	fullURL = strings.Trim(fullURL, "\n")
@@ -104,7 +111,12 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.AuthService.GetCurrentID()
+	id, ok := r.Context().Value("id").(string)
+	if !ok {
+		http.Error(w, "error on server", http.StatusInternalServerError)
+		logger.ErrorLogger.Println("id must be string")
+		return
+	}
 
 	fullURL := input.URL
 	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
@@ -137,7 +149,13 @@ func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	id := h.AuthService.GetCurrentID()
+	id, ok := r.Context().Value("id").(string)
+	if !ok {
+		http.Error(w, "error on server", http.StatusInternalServerError)
+		logger.ErrorLogger.Println("id must be string")
+		return
+	}
+
 	out, err := h.Service.GetAllUserURL(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -187,7 +205,13 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.AuthService.GetCurrentID()
+	id, ok := r.Context().Value("id").(string)
+	if !ok {
+		http.Error(w, "error on server", http.StatusInternalServerError)
+		logger.ErrorLogger.Println("id must be string")
+		return
+	}
+
 	tmp, err := h.Service.BatchSetURL(input, baseURL(r), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

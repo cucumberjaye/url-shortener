@@ -9,12 +9,12 @@ type LogsInfoRepository interface {
 }
 
 type URLRepository interface {
-	SetURL(fullURL, shortURL string, id int) (string, error)
+	SetURL(fullURL, shortURL string, id string) (string, error)
 	GetURL(shortURL string) (string, error)
 	GetURLCount() (int64, error)
-	GetAllUserURL(id int) ([]models.URLs, error)
-	CheckDBConn() error
-	BatchSetURL(data []models.BatchInputJSON, shortURL []string, id int) ([]models.BatchInputJSON, error)
+	GetAllUserURL(id string) ([]models.URLs, error)
+	BatchSetURL(data []models.BatchInputJSON, shortURL []string, id string) ([]models.BatchInputJSON, error)
+	CheckStorage() error
 }
 
 type URLLogs interface {

@@ -25,7 +25,7 @@ func NewShortenerService(repos service.URLRepository) (*ShortenerService, error)
 	}, nil
 }
 
-func (s *ShortenerService) ShortingURL(fullURL, baseURL string, id int) (string, error) {
+func (s *ShortenerService) ShortingURL(fullURL, baseURL string, id string) (string, error) {
 	shortURL := baseURL + fmt.Sprintf("%x", s.counter)
 	if short, err := s.repos.SetURL(fullURL, shortURL, id); err != nil {
 		if err.Error() == "url already exists" {
@@ -47,15 +47,15 @@ func (s *ShortenerService) GetFullURL(shortURL string) (string, error) {
 	return fullURL, err
 }
 
-func (s *ShortenerService) GetAllUserURL(id int) ([]models.URLs, error) {
+func (s *ShortenerService) GetAllUserURL(id string) ([]models.URLs, error) {
 	return s.repos.GetAllUserURL(id)
 }
 
 func (s *ShortenerService) CheckDBConn() error {
-	return s.repos.CheckDBConn()
+	return s.repos.CheckStorage()
 }
 
-func (s *ShortenerService) BatchSetURL(data []models.BatchInputJSON, baseURL string, id int) ([]models.BatchInputJSON, error) {
+func (s *ShortenerService) BatchSetURL(data []models.BatchInputJSON, baseURL string, id string) ([]models.BatchInputJSON, error) {
 	var shortURL = []string{}
 	for i := 0; i < len(data); i++ {
 		shortURL = append(shortURL, baseURL+fmt.Sprintf("%x", s.counter))

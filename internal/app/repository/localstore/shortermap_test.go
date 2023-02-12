@@ -1,6 +1,7 @@
 package localstore
 
 import (
+	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/stretchr/testify/require"
 	"os"
 	"sync"
@@ -9,7 +10,7 @@ import (
 
 func TestDatabase_GetURL(t *testing.T) {
 	type fields struct {
-		Store map[int]map[string]string
+		Store map[string]map[string]string
 	}
 	type args struct {
 		shortURL string
@@ -23,14 +24,14 @@ func TestDatabase_GetURL(t *testing.T) {
 	}{
 		{
 			name:    "ok",
-			fields:  fields{Store: map[int]map[string]string{0: {"0": "test.com"}}},
+			fields:  fields{Store: map[string]map[string]string{"1": {"0": "test.com"}}},
 			args:    args{shortURL: "0"},
 			want:    "test.com",
 			wantErr: false,
 		},
 		{
 			name:    "error",
-			fields:  fields{Store: map[int]map[string]string{}},
+			fields:  fields{Store: map[string]map[string]string{}},
 			args:    args{shortURL: "0"},
 			want:    "",
 			wantErr: true,
@@ -39,12 +40,12 @@ func TestDatabase_GetURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			d := &LocalStorage{
-				users: db{
+				users: repository.DB{
 					Store: tt.fields.Store,
-					Exist: map[int]map[string]int{0: {}},
+					Exist: map[string]map[string]int{"1": {}},
 				},
-				fileStore: nil,
-				mx:        sync.Mutex{},
+				keeper: nil,
+				mx:     sync.Mutex{},
 			}
 			got, err := d.GetURL(tt.args.shortURL)
 			if (err != nil) != tt.wantErr {
@@ -60,8 +61,8 @@ func TestDatabase_GetURL(t *testing.T) {
 
 func TestDatabase_SetURL(t *testing.T) {
 	type fields struct {
-		Store map[int]map[string]string
-		Exist map[int]map[string]int
+		Store map[string]map[string]string
+		Exist map[string]map[string]int
 	}
 	type args struct {
 		fullURL  string
@@ -76,8 +77,8 @@ func TestDatabase_SetURL(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				Store: map[int]map[string]string{},
-				Exist: map[int]map[string]int{},
+				Store: map[string]map[string]string{},
+				Exist: map[string]map[string]int{},
 			},
 			args:    args{shortURL: "0", fullURL: "test.com"},
 			wantErr: false,
@@ -85,8 +86,8 @@ func TestDatabase_SetURL(t *testing.T) {
 		{
 			name: "error",
 			fields: fields{
-				Store: map[int]map[string]string{0: {"0": "test.com"}},
-				Exist: map[int]map[string]int{0: {"test.com": 0}},
+				Store: map[string]map[string]string{"1": {"0": "test.com"}},
+				Exist: map[string]map[string]int{"1": {"test.com": 0}},
 			},
 			args:    args{shortURL: "0", fullURL: "test.com"},
 			wantErr: true,
@@ -99,13 +100,13 @@ func TestDatabase_SetURL(t *testing.T) {
 			defer os.Remove("test.txt")
 			defer file.Close()
 			d := &LocalStorage{
-				users: db{
+				users: repository.DB{
 					Store: tt.fields.Store,
 					Exist: tt.fields.Exist,
 				},
-				fileStore: nil,
+				keeper: nil,
 			}
-			if _, err := d.SetURL(tt.args.fullURL, tt.args.shortURL, 0); (err != nil) != tt.wantErr {
+			if _, err := d.SetURL(tt.args.fullURL, tt.args.shortURL, "1"); (err != nil) != tt.wantErr {
 				t.Errorf("SetURL() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

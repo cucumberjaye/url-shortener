@@ -2,8 +2,13 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/cucumberjaye/url-shortener/configs"
 	_ "github.com/jackc/pgx/v5/stdlib"
+
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func New() (*sql.DB, error) {
@@ -12,22 +17,17 @@ func New() (*sql.DB, error) {
 		return nil, err
 	}
 
-	err = createTable(db)
+	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://./migration",
+		"postgres", driver)
 	if err != nil {
 		return nil, err
 	}
 
+	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return nil, err
+	}
+
 	return db, nil
-}
-
-func createTable(db *sql.DB) error {
-	query := `CREATE TABLE IF NOT EXISTS urls (
-    	user_id integer not null,
-    	short_url varchar(255) not null,
-    	original_url varchar(255) not null unique,
-    	uses integer not null)`
-
-	_, err := db.Exec(query)
-
-	return err
 }

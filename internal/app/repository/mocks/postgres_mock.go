@@ -35,7 +35,7 @@ func (m *MockURLRepository) EXPECT() *MockURLRepositoryMockRecorder {
 }
 
 // BatchSetURL mocks base method.
-func (m *MockURLRepository) BatchSetURL(arg0 []models.BatchInputJSON, arg1 []string, arg2 int) ([]models.BatchInputJSON, error) {
+func (m *MockURLRepository) BatchSetURL(arg0 []models.BatchInputJSON, arg1 []string, arg2 string) ([]models.BatchInputJSON, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BatchSetURL", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]models.BatchInputJSON)
@@ -49,22 +49,22 @@ func (mr *MockURLRepositoryMockRecorder) BatchSetURL(arg0, arg1, arg2 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchSetURL", reflect.TypeOf((*MockURLRepository)(nil).BatchSetURL), arg0, arg1, arg2)
 }
 
-// CheckDBConn mocks base method.
-func (m *MockURLRepository) CheckDBConn() error {
+// CheckStorage mocks base method.
+func (m *MockURLRepository) CheckStorage() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckDBConn")
+	ret := m.ctrl.Call(m, "CheckStorage")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CheckDBConn indicates an expected call of CheckDBConn.
-func (mr *MockURLRepositoryMockRecorder) CheckDBConn() *gomock.Call {
+// CheckStorage indicates an expected call of CheckStorage.
+func (mr *MockURLRepositoryMockRecorder) CheckStorage() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckDBConn", reflect.TypeOf((*MockURLRepository)(nil).CheckDBConn))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckStorage", reflect.TypeOf((*MockURLRepository)(nil).CheckStorage))
 }
 
 // GetAllUserURL mocks base method.
-func (m *MockURLRepository) GetAllUserURL(arg0 int) ([]models.URLs, error) {
+func (m *MockURLRepository) GetAllUserURL(arg0 string) ([]models.URLs, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllUserURL", arg0)
 	ret0, _ := ret[0].([]models.URLs)
@@ -109,7 +109,7 @@ func (mr *MockURLRepositoryMockRecorder) GetURLCount() *gomock.Call {
 }
 
 // SetURL mocks base method.
-func (m *MockURLRepository) SetURL(arg0, arg1 string, arg2 int) (string, error) {
+func (m *MockURLRepository) SetURL(arg0, arg1, arg2 string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetURL", arg0, arg1, arg2)
 	ret0, _ := ret[0].(string)
