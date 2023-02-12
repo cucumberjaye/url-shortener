@@ -41,7 +41,7 @@ func (d *LocalStorage) SetURL(fullURL, shortURL string, id string) (string, erro
 		if _, ok := d.users.Exist[id][fullURL]; ok {
 			for short, full := range d.users.Store[id] {
 				if full == fullURL {
-					return short, errors.New("url already exist")
+					return short, errors.New("url already exists")
 				}
 			}
 
@@ -89,7 +89,7 @@ func (d *LocalStorage) GetURL(shortURL string) (string, error) {
 		}
 	}
 
-	return url, errors.New("url is not exist")
+	return url, errors.New("url is not exists")
 }
 
 func (d *LocalStorage) GetRequestCount(shortURL string) (int, error) {
@@ -103,7 +103,7 @@ func (d *LocalStorage) GetRequestCount(shortURL string) (int, error) {
 			}
 		}
 	}
-	return 0, errors.New("url is not exist")
+	return 0, errors.New("url is not exists")
 }
 
 func (d *LocalStorage) GetURLCount() (int64, error) {
@@ -140,7 +140,7 @@ func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []stri
 	for i := 0; i < len(data); i++ {
 		if _, ok := d.users.Store[id]; ok {
 			if _, ok := d.users.Exist[id][data[i].OriginalURL]; ok {
-				return nil, errors.New("url already exist")
+				return nil, errors.New("url already exists")
 			}
 			d.users.Exist[id][data[i].OriginalURL] = 0
 			d.users.Store[id][shortURL[i]] = data[i].OriginalURL
