@@ -63,21 +63,21 @@ func GzipDecompress(next http.Handler) http.Handler {
 	})
 }
 
+type UserID string
+
 func Authentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c, err := r.Cookie("authorization")
 		if err == nil {
 			id, err := token.CheckToken(c.Value)
 			if err == nil {
-				userId := "user_id"
-				ctx := context.WithValue(r.Context(), userId, id)
+				ctx := context.WithValue(r.Context(), UserID("user_id"), id)
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
 		}
 		id := uuid.New().String()
-		userId := "user_id"
-		ctx := context.WithValue(r.Context(), userId, id)
+		ctx := context.WithValue(r.Context(), UserID("user_id"), id)
 		authToken, err := token.GenerateNewToken(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
