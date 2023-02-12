@@ -18,6 +18,10 @@ func New() (*sql.DB, error) {
 	}
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		return nil, err
+	}
+
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://./migration",
 		"postgres", driver)

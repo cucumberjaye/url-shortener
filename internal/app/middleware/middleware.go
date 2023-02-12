@@ -69,13 +69,15 @@ func Authentication(next http.Handler) http.Handler {
 		if err == nil {
 			id, err := token.CheckToken(c.Value)
 			if err == nil {
-				ctx := context.WithValue(r.Context(), "user_id", id)
+				userId := "user_id"
+				ctx := context.WithValue(r.Context(), userId, id)
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
 		}
 		id := uuid.New().String()
-		ctx := context.WithValue(r.Context(), "user_id", id)
+		userId := "user_id"
+		ctx := context.WithValue(r.Context(), userId, id)
 		authToken, err := token.GenerateNewToken(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
