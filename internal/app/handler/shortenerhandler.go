@@ -263,6 +263,9 @@ func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusAccepted)
 
+	for i := range input {
+		input[i] = r.URL.Scheme + r.Host + getURLPath + input[i]
+	}
 	h.Service.BatchDeleteURL(input, id)
 }
 
