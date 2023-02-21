@@ -2,7 +2,6 @@ package localstore
 
 import (
 	"errors"
-	"fmt"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/cucumberjaye/url-shortener/models"
 	"sync"
@@ -27,7 +26,6 @@ func NewShortenerDB(keeper repository.Keeper) (*LocalStorage, error) {
 			return nil, err
 		}
 	}
-	fmt.Println(users)
 
 	return &LocalStorage{
 		users:  users,
