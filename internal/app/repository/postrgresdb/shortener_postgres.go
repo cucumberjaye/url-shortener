@@ -35,8 +35,12 @@ func (k *SQLStore) GetAllData() (repository.DB, error) {
 	for row.Next() {
 		var id, short, full string
 		var count int
-		if err = row.Scan(&id, &short, &full, &count); err != nil {
+		var deleted bool
+		if err = row.Scan(&id, &short, &full, &count, &deleted); err != nil {
 			return users, err
+		}
+		if deleted == true {
+			count = -1
 		}
 		if _, ok := users.Store[id]; !ok {
 			users.Store[id] = map[string]string{short: full}
@@ -58,8 +62,8 @@ func (k *SQLStore) Set(users repository.DB) error {
 	for key, val := range users.Store {
 		for short, full := range val {
 			if short != "" {
-				query := "INSERT INTO urls (user_id, short_url, original_url, uses) VALUES ($1, $2, $3, $4)"
-				_, err := k.db.Exec(query, key, short, full, 0)
+				query := "INSERT INTO urls (user_id, short_url, original_url, uses, deleted) VALUES ($1, $2, $3, $4, $5)"
+				_, err := k.db.Exec(query, key, short, full, 0, false)
 				if err != nil {
 					return err
 				}
@@ -70,10 +74,18 @@ func (k *SQLStore) Set(users repository.DB) error {
 
 	for _, val := range users.Exist {
 		for full, count := range val {
-			query := "UPDATE urls SET uses=$1 WHERE original_url=$2"
-			_, err := k.db.Exec(query, count, full)
-			if err != nil {
-				return err
+			if count == -1 {
+				query := "UPDATE urls SET deleted=TRUE WHERE original_url=$1"
+				_, err := k.db.Exec(query, full)
+				if err != nil {
+					return err
+				}
+			} else {
+				query := "UPDATE urls SET uses=$1 WHERE original_url=$2"
+				_, err := k.db.Exec(query, count, full)
+				if err != nil {
+					return err
+				}
 			}
 			return nil
 		}

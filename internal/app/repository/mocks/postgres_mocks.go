@@ -34,6 +34,20 @@ func (m *MockURLRepository) EXPECT() *MockURLRepositoryMockRecorder {
 	return m.recorder
 }
 
+// BatchDeleteURL mocks base method.
+func (m *MockURLRepository) BatchDeleteURL(arg0 chan string, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BatchDeleteURL", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchDeleteURL indicates an expected call of BatchDeleteURL.
+func (mr *MockURLRepositoryMockRecorder) BatchDeleteURL(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchDeleteURL", reflect.TypeOf((*MockURLRepository)(nil).BatchDeleteURL), arg0, arg1)
+}
+
 // BatchSetURL mocks base method.
 func (m *MockURLRepository) BatchSetURL(arg0 []models.BatchInputJSON, arg1 []string, arg2 string) ([]models.BatchInputJSON, error) {
 	m.ctrl.T.Helper()

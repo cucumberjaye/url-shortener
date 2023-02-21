@@ -14,6 +14,7 @@ type URLRepository interface {
 	GetURLCount() (int64, error)
 	GetAllUserURL(id string) ([]models.URLs, error)
 	BatchSetURL(data []models.BatchInputJSON, shortURL []string, id string) ([]models.BatchInputJSON, error)
+	BatchDeleteURL(ch chan string, id string) error
 	CheckStorage() error
 }
 

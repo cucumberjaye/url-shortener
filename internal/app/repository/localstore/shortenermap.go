@@ -2,6 +2,7 @@ package localstore
 
 import (
 	"errors"
+	"fmt"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/cucumberjaye/url-shortener/models"
 	"sync"
@@ -26,6 +27,7 @@ func NewShortenerDB(keeper repository.Keeper) (*LocalStorage, error) {
 			return nil, err
 		}
 	}
+	fmt.Println(users)
 
 	return &LocalStorage{
 		users:  users,
@@ -73,6 +75,9 @@ func (d *LocalStorage) GetURL(shortURL string) (string, error) {
 	for id, s := range d.users.Store {
 		for k, v := range s {
 			if k == shortURL {
+				if d.users.Exist[id][v] == -1 {
+					return "", errors.New("URL was deleted")
+				}
 				url = v
 				d.users.Exist[id][url]++
 				if d.keeper != nil {
@@ -163,6 +168,29 @@ func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []stri
 	}
 
 	return data, nil
+}
+
+func (d *LocalStorage) BatchDeleteURL(ch chan string, id string) error {
+	d.mx.Lock()
+	defer d.mx.Unlock()
+
+	short := <-ch
+	if _, ok := d.users.Store[id]; ok {
+		if full, ok := d.users.Store[id][short]; ok {
+			d.users.Exist[id][full] = -1
+			if d.keeper != nil {
+				user := repository.DB{
+					Store: nil,
+					Exist: map[string]map[string]int{id: {full: -1}},
+				}
+				if err := d.keeper.Set(user); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}
+	return errors.New("url does not exist")
 }
 
 func (d *LocalStorage) CheckStorage() error {

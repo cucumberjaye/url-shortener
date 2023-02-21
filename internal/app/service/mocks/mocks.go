@@ -33,3 +33,6 @@ func (m *ServiceMock) CheckDBConn() error {
 func (m *ServiceMock) BatchSetURL(data []models.BatchInputJSON, baseURL string, id string) ([]models.BatchInputJSON, error) {
 	return []models.BatchInputJSON{}, nil
 }
+
+func (m *ServiceMock) BatchDeleteURL(data []string, id string) {
+}

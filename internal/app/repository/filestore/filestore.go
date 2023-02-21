@@ -50,7 +50,7 @@ func (k *FileStore) GetAllData() (repository.DB, error) {
 				if _, ok := users.Store[key]; ok {
 					users.Store[key][short] = full
 				} else {
-					users.Store[key] = map[string]string{short: key}
+					users.Store[key] = map[string]string{short: full}
 				}
 			}
 		}

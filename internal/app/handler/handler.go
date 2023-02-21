@@ -22,6 +22,7 @@ type URLService interface {
 	GetAllUserURL(id string) ([]models.URLs, error)
 	CheckDBConn() error
 	BatchSetURL(data []models.BatchInputJSON, baseURL string, id string) ([]models.BatchInputJSON, error)
+	BatchDeleteURL(data []string, id string)
 }
 
 type Handler struct {
@@ -53,6 +54,7 @@ func (h *Handler) InitRoutes() *chi.Mux {
 
 			r.Route("/user", func(r chi.Router) {
 				r.Get("/urls", h.getUserURL)
+				r.Delete("/urls", h.deleteUserURL)
 			})
 		})
 	})
