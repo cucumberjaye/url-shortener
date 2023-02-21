@@ -10,8 +10,6 @@ import (
 	"sync/atomic"
 )
 
-const workers = 5
-
 type ShortenerService struct {
 	repos   service.URLRepository
 	counter int64
@@ -71,7 +69,7 @@ func (s *ShortenerService) BatchDeleteURL(data []string, id string) {
 	ch := make(chan string)
 	g, _ := errgroup.WithContext(context.Background())
 
-	for i := 0; i < workers; i++ {
+	for _, short := range data {
 		g.Go(func() error {
 			if err := s.repos.BatchDeleteURL(ch, id); err != nil {
 				return err
@@ -79,9 +77,6 @@ func (s *ShortenerService) BatchDeleteURL(data []string, id string) {
 
 			return nil
 		})
-	}
-
-	for _, short := range data {
 		ch <- short
 	}
 	close(ch)
