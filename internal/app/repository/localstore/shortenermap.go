@@ -175,6 +175,9 @@ func (d *LocalStorage) BatchDeleteURL(ch chan string, id string) error {
 	short := <-ch
 	if _, ok := d.users.Store[id]; ok {
 		if full, ok := d.users.Store[id][short]; ok {
+			if d.users.Exist[id][full] == -1 {
+				return nil
+			}
 			d.users.Exist[id][full] = -1
 			if d.keeper != nil {
 				user := repository.DB{

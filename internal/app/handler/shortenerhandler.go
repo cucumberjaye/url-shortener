@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	mw "github.com/cucumberjaye/url-shortener/internal/app/middleware"
 	"io"
 	"net/http"
@@ -270,7 +269,6 @@ func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 	}
 	for i := range input {
 		input[i] = prefix.String() + input[i]
-		fmt.Println(input[i])
 	}
 
 	h.Service.BatchDeleteURL(input, id)
