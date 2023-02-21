@@ -25,7 +25,10 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	short := chi.URLParam(r, "short")
 	short = baseURL(r) + short
 	fullURL, err := h.Service.GetFullURL(short)
-	if err != nil {
+	if err != nil && err.Error() == "URL was deleted" {
+		w.WriteHeader(http.StatusGone)
+		return
+	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, shortURL.String(), err.Error())
 		return
@@ -234,6 +237,33 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 		logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, input[i].OriginalURL, out[i].ShortURL)
 	}
 
+}
+
+func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
+	var input []string
+
+	URL := url.URL{
+		Scheme: configs.Scheme,
+		Host:   r.Host,
+		Path:   r.URL.Path,
+	}
+
+	id, ok := r.Context().Value(mw.UserID("user_id")).(string)
+	if !ok {
+		http.Error(w, "error on server", http.StatusInternalServerError)
+		logger.ErrorLogger.Println("id must be string")
+		return
+	}
+
+	if err := render.DecodeJSON(r.Body, &input); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
+
+	h.Service.BatchDeleteURL(input, id)
 }
 
 func baseURL(r *http.Request) string {
