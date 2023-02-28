@@ -94,7 +94,7 @@ func TestHandler_Shortener(t *testing.T) {
 	logger.Discard()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
-	ch := make(chan models.DeleteData)
+	ch := make(chan []models.DeleteData)
 	handlers := NewHandler(URLServices, logsServices, ch)
 
 	r := handlers.InitRoutes()
@@ -163,7 +163,7 @@ func TestHandler_JSONShortener(t *testing.T) {
 	logger.Discard()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
-	ch := make(chan models.DeleteData)
+	ch := make(chan []models.DeleteData)
 	handlers := NewHandler(URLServices, logsServices, ch)
 
 	r := handlers.InitRoutes()

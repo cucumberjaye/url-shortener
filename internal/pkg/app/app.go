@@ -51,7 +51,7 @@ func New() (*App, error) {
 	}
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
 
-	ch := make(chan models.DeleteData, 20)
+	ch := make(chan []models.DeleteData)
 
 	deleterService := deleter.New(repos, ch)
 	go deleterService.Deleting()
