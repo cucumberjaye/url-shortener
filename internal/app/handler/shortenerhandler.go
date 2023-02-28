@@ -261,6 +261,9 @@ func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusAccepted)
+	w.Write([]byte{})
+
 	data := []models.DeleteData{}
 	for i := range input {
 		input[i] = baseURL(r) + input[i]
@@ -271,8 +274,6 @@ func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.Ch <- data
-
-	w.WriteHeader(http.StatusAccepted)
 }
 
 func baseURL(r *http.Request) string {
