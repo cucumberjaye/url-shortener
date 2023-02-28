@@ -2,6 +2,7 @@ package localstore
 
 import (
 	"errors"
+	"fmt"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/cucumberjaye/url-shortener/models"
 	"sync"
@@ -190,7 +191,7 @@ func (d *LocalStorage) BatchDeleteURL(ch chan models.DeleteData) error {
 				}
 			}
 		} else {
-			return errors.New("url does not exist")
+			fmt.Printf("url %s does not exist", short)
 		}
 		d.mx.Unlock()
 	}

@@ -39,7 +39,7 @@ func (k *SQLStore) GetAllData() (repository.DB, error) {
 		if err = row.Scan(&id, &short, &full, &count, &deleted); err != nil {
 			return users, err
 		}
-		if deleted == true {
+		if deleted {
 			count = -1
 		}
 		if _, ok := users.Store[id]; !ok {
