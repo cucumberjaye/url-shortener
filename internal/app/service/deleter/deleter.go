@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const workers = 5
+const workers = 20
 
 type Deleter struct {
 	repos service.DeleterRepository
