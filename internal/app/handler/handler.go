@@ -22,18 +22,19 @@ type URLService interface {
 	GetAllUserURL(id string) ([]models.URLs, error)
 	CheckDBConn() error
 	BatchSetURL(data []models.BatchInputJSON, baseURL string, id string) ([]models.BatchInputJSON, error)
-	BatchDeleteURL(data []string, id string)
 }
 
 type Handler struct {
 	Service       URLService
 	LoggerService LogsInfoService
+	Ch            chan models.DeleteData
 }
 
-func NewHandler(service URLService, logsService LogsInfoService) *Handler {
+func NewHandler(service URLService, logsService LogsInfoService, ch chan models.DeleteData) *Handler {
 	return &Handler{
 		Service:       service,
 		LoggerService: logsService,
+		Ch:            ch,
 	}
 }
 

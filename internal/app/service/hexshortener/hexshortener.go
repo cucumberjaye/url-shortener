@@ -1,12 +1,9 @@
 package hexshortener
 
 import (
-	"context"
 	"fmt"
 	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/cucumberjaye/url-shortener/models"
-	"github.com/cucumberjaye/url-shortener/pkg/logger"
-	"golang.org/x/sync/errgroup"
 	"sync/atomic"
 )
 
@@ -65,25 +62,4 @@ func (s *ShortenerService) BatchSetURL(data []models.BatchInputJSON, baseURL str
 		atomic.AddInt64(&s.counter, 1)
 	}
 	return s.repos.BatchSetURL(data, shortURL, id)
-}
-
-func (s *ShortenerService) BatchDeleteURL(data []string, id string) {
-	ch := make(chan string)
-	g, _ := errgroup.WithContext(context.Background())
-
-	for _, short := range data {
-		g.Go(func() error {
-			if err := s.repos.BatchDeleteURL(ch, id); err != nil {
-				return err
-			}
-
-			return nil
-		})
-		ch <- short
-	}
-	close(ch)
-
-	if err := g.Wait(); err != nil {
-		logger.ErrorLogger.Println(err.Error())
-	}
 }

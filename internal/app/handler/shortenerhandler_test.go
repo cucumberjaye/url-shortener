@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/cucumberjaye/url-shortener/configs"
 	mocks2 "github.com/cucumberjaye/url-shortener/internal/app/service/mocks"
+	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -93,7 +94,8 @@ func TestHandler_Shortener(t *testing.T) {
 	logger.Discard()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
-	handlers := NewHandler(URLServices, logsServices)
+	ch := make(chan models.DeleteData)
+	handlers := NewHandler(URLServices, logsServices, ch)
 
 	r := handlers.InitRoutes()
 	ts := httptest.NewServer(r)
@@ -161,7 +163,8 @@ func TestHandler_JSONShortener(t *testing.T) {
 	logger.Discard()
 	URLServices := &mocks2.ServiceMock{}
 	logsServices := &mocks2.LogsMock{}
-	handlers := NewHandler(URLServices, logsServices)
+	ch := make(chan models.DeleteData)
+	handlers := NewHandler(URLServices, logsServices, ch)
 
 	r := handlers.InitRoutes()
 	ts := httptest.NewServer(r)

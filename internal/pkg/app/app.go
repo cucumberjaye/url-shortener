@@ -8,8 +8,10 @@ import (
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/filestore"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
 	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgresdb"
+	"github.com/cucumberjaye/url-shortener/internal/app/service/deleter"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/shortenerlogsinfo"
+	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/postgres"
 	"github.com/go-chi/chi"
 	"net/http"
@@ -49,12 +51,19 @@ func New() (*App, error) {
 	}
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
 
-	handlers := handler.NewHandler(serviceURL, logsService)
+	ch := make(chan models.DeleteData)
+
+	deleterService := deleter.New(repos, ch)
+	go deleterService.Deleting()
+
+	handlers := handler.NewHandler(serviceURL, logsService, ch)
 
 	mux := chi.NewMux()
 	mux.Mount("/", handlers.InitRoutes())
 
-	app := &App{mux: mux}
+	app := &App{
+		mux: mux,
+	}
 
 	return app, nil
 }
