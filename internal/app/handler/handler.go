@@ -27,10 +27,10 @@ type URLService interface {
 type Handler struct {
 	Service       URLService
 	LoggerService LogsInfoService
-	Ch            chan []models.DeleteData
+	Ch            chan models.DeleteData
 }
 
-func NewHandler(service URLService, logsService LogsInfoService, ch chan []models.DeleteData) *Handler {
+func NewHandler(service URLService, logsService LogsInfoService, ch chan models.DeleteData) *Handler {
 	return &Handler{
 		Service:       service,
 		LoggerService: logsService,

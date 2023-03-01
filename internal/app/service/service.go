@@ -21,7 +21,3 @@ type URLLogs interface {
 	URLRepository
 	LogsInfoRepository
 }
-
-type DeleterRepository interface {
-	BatchDeleteURL(ch chan models.DeleteData) error
-}

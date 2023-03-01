@@ -169,31 +169,27 @@ func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []stri
 	return data, nil
 }
 
-func (d *LocalStorage) BatchDeleteURL(ch chan models.DeleteData) error {
-	for deleteData := range ch {
-		d.mx.Lock()
-		id := deleteData.ID
-		short := deleteData.ShortURL
-		if _, ok := d.users.Store[id]; ok {
-			if full, ok := d.users.Store[id][short]; ok {
-				if d.users.Exist[id][full] == -1 {
-					return nil
+func (d *LocalStorage) BatchDeleteURL(short, id string) error {
+	d.mx.Lock()
+	defer d.mx.Unlock()
+	if _, ok := d.users.Store[id]; ok {
+		if full, ok := d.users.Store[id][short]; ok {
+			if d.users.Exist[id][full] == -1 {
+				return nil
+			}
+			d.users.Exist[id][full] = -1
+			if d.keeper != nil {
+				user := repository.DB{
+					Store: nil,
+					Exist: map[string]map[string]int{id: {full: -1}},
 				}
-				d.users.Exist[id][full] = -1
-				if d.keeper != nil {
-					user := repository.DB{
-						Store: nil,
-						Exist: map[string]map[string]int{id: {full: -1}},
-					}
-					if err := d.keeper.Set(user); err != nil {
-						return err
-					}
+				if err := d.keeper.Set(user); err != nil {
+					return err
 				}
 			}
-		} else {
-			fmt.Printf("url %s does not exist", short)
 		}
-		d.mx.Unlock()
+	} else {
+		return fmt.Errorf("url %s does not exist", short)
 	}
 	return nil
 }

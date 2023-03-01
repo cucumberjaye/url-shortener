@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
@@ -8,9 +9,9 @@ import (
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/filestore"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/localstore"
 	ps "github.com/cucumberjaye/url-shortener/internal/app/repository/postrgresdb"
-	"github.com/cucumberjaye/url-shortener/internal/app/service/deleter"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/hexshortener"
 	"github.com/cucumberjaye/url-shortener/internal/app/service/shortenerlogsinfo"
+	"github.com/cucumberjaye/url-shortener/internal/app/worker"
 	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/postgres"
 	"github.com/go-chi/chi"
@@ -51,10 +52,10 @@ func New() (*App, error) {
 	}
 	logsService := shortenerlogsinfo.NewURLLogsInfo(repos)
 
-	ch := make(chan []models.DeleteData, 20)
+	ch := make(chan models.DeleteData)
 
-	deleterService := deleter.New(repos, ch)
-	go deleterService.Deleting()
+	workers := worker.New(repos, ch)
+	workers.Start(context.Background())
 
 	handlers := handler.NewHandler(serviceURL, logsService, ch)
 
