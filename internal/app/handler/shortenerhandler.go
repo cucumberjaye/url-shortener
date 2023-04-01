@@ -1,11 +1,12 @@
 package handler
 
 import (
-	mw "github.com/cucumberjaye/url-shortener/internal/app/middleware"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	mw "github.com/cucumberjaye/url-shortener/internal/app/middleware"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -22,8 +23,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	short := chi.URLParam(r, "short")
-	short = baseURL(r) + short
+	short := baseURL(r) + chi.URLParam(r, "short")
 	fullURL, err := h.Service.GetFullURL(short)
 	if err != nil && err.Error() == "URL was deleted" {
 		w.WriteHeader(http.StatusGone)
@@ -71,8 +71,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fullURL := string(body)
-	fullURL = strings.Trim(fullURL, "\n")
+	fullURL := strings.Trim(string(body), "\n")
 	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
 	if err != nil && err.Error() == "url already exists" {
 		w.WriteHeader(http.StatusConflict)
@@ -195,7 +194,6 @@ func (h *Handler) checkDBConn(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 	var input []models.BatchInputJSON
-	var out = []models.BatchOutputJSON{}
 
 	URL := url.URL{
 		Scheme: configs.Scheme,
@@ -222,12 +220,14 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
 		return
 	}
+	length := len(tmp)
+	out := make([]models.BatchOutputJSON, length)
 
 	for i := 0; i < len(tmp); i++ {
-		out = append(out, models.BatchOutputJSON{
+		out[i] = models.BatchOutputJSON{
 			CorrelationID: tmp[i].CorrelationID,
 			ShortURL:      tmp[i].OriginalURL,
-		})
+		}
 	}
 
 	render.Status(r, http.StatusCreated)
