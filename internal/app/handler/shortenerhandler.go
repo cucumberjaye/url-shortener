@@ -223,7 +223,7 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 	length := len(tmp)
 	out := make([]models.BatchOutputJSON, length)
 
-	for i := 0; i < len(tmp); i++ {
+	for i := 0; i < length; i++ {
 		out[i] = models.BatchOutputJSON{
 			CorrelationID: tmp[i].CorrelationID,
 			ShortURL:      tmp[i].OriginalURL,
