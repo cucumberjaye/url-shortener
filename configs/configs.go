@@ -7,12 +7,12 @@ import (
 )
 
 var (
-	ServerAddress   string
-	BaseURL         string
-	Scheme          string // http or https
-	FileStoragePath string
-	SigningKey      string // for token generate
-	DataBaseDSN     string
+	ServerAddress   string // адрес сервера
+	BaseURL         string // базовый адрес результирующего сокращённого URL
+	Scheme          string // http или https
+	FileStoragePath string // путь к файлу для хранения данных
+	SigningKey      string // для генерации токена авторизации
+	DataBaseDSN     string // для подключения к postgreSQL
 )
 
 const (

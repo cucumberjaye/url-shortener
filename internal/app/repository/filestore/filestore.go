@@ -27,6 +27,7 @@ func New(filename string) (*FileStore, error) {
 	}, nil
 }
 
+// Проверяет, что возможно взаимодействовать с файлом
 func (k *FileStore) CheckKeeper() error {
 	if k.fileStore == nil {
 		return errors.New("file does not exist")

@@ -5,10 +5,10 @@ import (
 )
 
 var (
-	ServerAddress   string
-	BaseURL         string
-	FileStoragePath string
-	DataBaseDSN     string
+	ServerAddress   string // адрес сервера
+	BaseURL         string // базовый адрес результирующего сокращённого URL
+	FileStoragePath string // путь к файлу для хранения данных
+	DataBaseDSN     string // для подключения к postgreSQL
 )
 
 const (

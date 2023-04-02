@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	InfoLogger    *log.Logger
-	WarningLogger *log.Logger
-	ErrorLogger   *log.Logger
+	InfoLogger    *log.Logger // для вывода информации
+	WarningLogger *log.Logger // для вывода информации, которая может породить ошибки
+	ErrorLogger   *log.Logger // для вывода ошибок
 )
 
 // Создает пользовательские логеры
