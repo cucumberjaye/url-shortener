@@ -4,6 +4,7 @@ import (
 	"flag"
 )
 
+// переменные для считывания значиений флагов
 var (
 	ServerAddress   string // адрес сервера
 	BaseURL         string // базовый адрес результирующего сокращённого URL
@@ -11,6 +12,7 @@ var (
 	DataBaseDSN     string // для подключения к postgreSQL
 )
 
+// дефолтные значения
 const (
 	defaultServerAddress = "localhost:8080"
 )

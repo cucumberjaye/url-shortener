@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Разного уровня логгеры
 var (
 	InfoLogger    *log.Logger // для вывода информации
 	WarningLogger *log.Logger // для вывода информации, которая может породить ошибки

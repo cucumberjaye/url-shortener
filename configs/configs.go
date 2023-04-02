@@ -6,6 +6,7 @@ import (
 	"github.com/cucumberjaye/url-shortener/pkg/flags"
 )
 
+// переменные для считывания env значений
 var (
 	ServerAddress   string // адрес сервера
 	BaseURL         string // базовый адрес результирующего сокращённого URL
@@ -15,6 +16,7 @@ var (
 	DataBaseDSN     string // для подключения к postgreSQL
 )
 
+// значения пол умолчанию
 const (
 	defaultScheme     = "http"
 	defaultSigningKey = "qwerty1234"
