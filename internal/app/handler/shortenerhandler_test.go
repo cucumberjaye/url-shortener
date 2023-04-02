@@ -214,6 +214,7 @@ func BenchmarkGetURL(b *testing.B) {
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		http.DefaultClient.Do(request)
+		resp, _ := http.DefaultClient.Do(request)
+		resp.Body.Close()
 	}
 }
