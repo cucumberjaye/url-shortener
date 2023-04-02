@@ -15,6 +15,7 @@ const (
 	defaultServerAddress = "localhost:8080"
 )
 
+// Обрабатывает флаги при запуске
 func InitFlags() {
 	flag.StringVar(&ServerAddress, "a", defaultServerAddress, "server address to listen on")
 	flag.StringVar(&BaseURL, "b", "", "base address for get method result")

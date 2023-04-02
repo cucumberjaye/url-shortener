@@ -12,6 +12,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+// Подключается к postgreSQL
 func New() (*sql.DB, error) {
 	db, err := sql.Open("pgx", configs.DataBaseDSN)
 	if err != nil {

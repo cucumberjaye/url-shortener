@@ -14,15 +14,18 @@ import (
 	"github.com/cucumberjaye/url-shortener/pkg/token"
 )
 
+// для передачи зашифрованного тела далее
 type gzipWriter struct {
 	http.ResponseWriter
 	Writer io.Writer
 }
 
+// метод структуры gzipWriter для записи
 func (w gzipWriter) Write(data []byte) (int, error) {
 	return w.Writer.Write(data)
 }
 
+// GzipCompress сжимает тело ответа в gzip
 func GzipCompress(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
@@ -42,6 +45,7 @@ func GzipCompress(next http.Handler) http.Handler {
 	})
 }
 
+// GzipDecompress возвращает сжатые данные в нормальный вид
 func GzipDecompress(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var reader io.Reader
@@ -64,8 +68,10 @@ func GzipDecompress(next http.Handler) http.Handler {
 	})
 }
 
+// для передачи id в контексте
 type UserID string
 
+// Authentication проверяет авторизован ли пользователь
 func Authentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c, err := r.Cookie("authorization")

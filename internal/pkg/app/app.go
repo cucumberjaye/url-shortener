@@ -19,10 +19,12 @@ import (
 	"github.com/go-chi/chi"
 )
 
+// Структура для запуска приложения
 type App struct {
 	mux *chi.Mux
 }
 
+// создаем Арр
 func New() (*App, error) {
 	configs.LoadConfig()
 
@@ -70,6 +72,7 @@ func New() (*App, error) {
 	return app, nil
 }
 
+// запускем сервер
 func (a *App) Run() error {
 	fmt.Println("server running")
 

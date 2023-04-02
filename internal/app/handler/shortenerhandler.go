@@ -91,6 +91,7 @@ func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
 }
 
+// JSON структура, которую принимает ShortenerJSON
 type JSONInput struct {
 	URL string `json:"url"`
 }
@@ -280,6 +281,7 @@ func (h *Handler) DeleteUserURL(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// baseURL формирует корроткую ссылку
 func baseURL(r *http.Request) string {
 	if configs.BaseURL != "" {
 		return configs.BaseURL + "/"

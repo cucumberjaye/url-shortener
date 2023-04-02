@@ -9,12 +9,14 @@ import (
 	"github.com/cucumberjaye/url-shortener/models"
 )
 
+// Структура для хранения в памяти программы
 type LocalStorage struct {
 	users  repository.DB
 	keeper repository.Keeper
 	mx     sync.Mutex
 }
 
+// Создаем локальное хранилище
 func NewShortenerDB(keeper repository.Keeper) (*LocalStorage, error) {
 	var users = repository.DB{
 		Store: map[string]map[string]string{},
@@ -36,6 +38,7 @@ func NewShortenerDB(keeper repository.Keeper) (*LocalStorage, error) {
 	}, nil
 }
 
+// Записываем короткую ссылку в хранилище и в файл или базу данных
 func (d *LocalStorage) SetURL(fullURL, shortURL string, id string) (string, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
@@ -68,6 +71,7 @@ func (d *LocalStorage) SetURL(fullURL, shortURL string, id string) (string, erro
 	return "", nil
 }
 
+// Получаем полную ссылку по сокращенной из хранилища
 func (d *LocalStorage) GetURL(shortURL string) (string, error) {
 	var url string
 	d.mx.Lock()
@@ -97,6 +101,7 @@ func (d *LocalStorage) GetURL(shortURL string) (string, error) {
 	return url, errors.New("url is not exists")
 }
 
+// Получаем количество получений по некоторой сокращенной ссылке
 func (d *LocalStorage) GetRequestCount(shortURL string) (int, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
@@ -111,6 +116,7 @@ func (d *LocalStorage) GetRequestCount(shortURL string) (int, error) {
 	return 0, errors.New("url is not exists")
 }
 
+// Получаем количество хранящихся ссылок
 func (d *LocalStorage) GetURLCount() (int64, error) {
 	var out int
 
@@ -126,6 +132,7 @@ func (d *LocalStorage) GetURLCount() (int64, error) {
 	return int64(out), nil
 }
 
+// Получаем все ссылки пользователя
 func (d *LocalStorage) GetAllUserURL(id string) ([]models.URLs, error) {
 	var out = []models.URLs{}
 
@@ -139,6 +146,7 @@ func (d *LocalStorage) GetAllUserURL(id string) ([]models.URLs, error) {
 	return out, nil
 }
 
+// Сохраняем ссылки пачкой
 func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []string, id string) ([]models.BatchInputJSON, error) {
 	d.mx.Lock()
 	defer d.mx.Unlock()
@@ -170,6 +178,7 @@ func (d *LocalStorage) BatchSetURL(data []models.BatchInputJSON, shortURL []stri
 	return data, nil
 }
 
+// Удаляем ссылки пачкой
 func (d *LocalStorage) BatchDeleteURL(short, id string) error {
 	d.mx.Lock()
 	defer d.mx.Unlock()
@@ -195,6 +204,7 @@ func (d *LocalStorage) BatchDeleteURL(short, id string) error {
 	return nil
 }
 
+// Проверяем постоянное хранилище на работоспособность
 func (d *LocalStorage) CheckStorage() error {
 	return d.keeper.CheckKeeper()
 }

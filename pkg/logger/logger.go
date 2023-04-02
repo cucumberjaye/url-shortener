@@ -12,6 +12,7 @@ var (
 	ErrorLogger   *log.Logger
 )
 
+// Создает пользовательские логеры
 func New() {
 
 	InfoLogger = log.New(os.Stdout, "INFO:  ", log.Ldate|log.Ltime|log.Lmsgprefix)
@@ -19,6 +20,7 @@ func New() {
 	ErrorLogger = log.New(os.Stderr, "ERROR:  ", log.Ldate|log.Ltime|log.Lmsgprefix)
 }
 
+// Отключает логирование
 func Discard() {
 	InfoLogger.SetOutput(io.Discard)
 	WarningLogger.SetOutput(io.Discard)

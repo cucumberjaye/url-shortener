@@ -1,16 +1,17 @@
 package configs
 
 import (
-	"github.com/cucumberjaye/url-shortener/pkg/flags"
 	"os"
+
+	"github.com/cucumberjaye/url-shortener/pkg/flags"
 )
 
 var (
 	ServerAddress   string
 	BaseURL         string
-	Scheme          string
+	Scheme          string // http or https
 	FileStoragePath string
-	SigningKey      string
+	SigningKey      string // for token generate
 	DataBaseDSN     string
 )
 
@@ -19,6 +20,7 @@ const (
 	defaultSigningKey = "qwerty1234"
 )
 
+// LoadConfig устанавливает переменные из env
 func LoadConfig() {
 	flags.InitFlags()
 
@@ -30,6 +32,7 @@ func LoadConfig() {
 	DataBaseDSN = lookUpOrSetDefault("DATABASE_DSN", flags.DataBaseDSN)
 }
 
+// lookUpOrSetDefault если нет env значения, устанавливает значение по умолчанию
 func lookUpOrSetDefault(name, defaultValue string) string {
 	out, ok := os.LookupEnv(name)
 	if !ok {

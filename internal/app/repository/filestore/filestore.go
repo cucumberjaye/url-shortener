@@ -8,11 +8,13 @@ import (
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 )
 
+// Структура для записи и чтения в файл в формате JSON
 type FileStore struct {
 	fileStore *os.File
 	encoder   *json.Encoder
 }
 
+// Создаем FileStore
 func New(filename string) (*FileStore, error) {
 	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
@@ -33,6 +35,7 @@ func (k *FileStore) CheckKeeper() error {
 	return nil
 }
 
+// Получаем содержимое файла и возвращаем
 func (k *FileStore) GetAllData() (repository.DB, error) {
 	var users = repository.DB{
 		Store: map[string]map[string]string{},
@@ -69,6 +72,7 @@ func (k *FileStore) GetAllData() (repository.DB, error) {
 	return users, nil
 }
 
+// Записываем в файл
 func (k *FileStore) Set(users repository.DB) error {
 	if err := k.encoder.Encode(&users); err != nil {
 		return err
