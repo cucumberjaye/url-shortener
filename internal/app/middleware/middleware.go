@@ -3,11 +3,12 @@ package middleware
 import (
 	"compress/gzip"
 	"context"
-	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/cucumberjaye/url-shortener/pkg/token"

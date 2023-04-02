@@ -2,9 +2,10 @@ package hexshortener
 
 import (
 	"fmt"
+	"sync/atomic"
+
 	"github.com/cucumberjaye/url-shortener/internal/app/service"
 	"github.com/cucumberjaye/url-shortener/models"
-	"sync/atomic"
 )
 
 const workers = 5

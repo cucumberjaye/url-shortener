@@ -3,9 +3,10 @@ package localstore
 import (
 	"errors"
 	"fmt"
+	"sync"
+
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 	"github.com/cucumberjaye/url-shortener/models"
-	"sync"
 )
 
 type LocalStorage struct {

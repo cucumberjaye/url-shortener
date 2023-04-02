@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"errors"
+
 	"github.com/cucumberjaye/url-shortener/configs"
 	_ "github.com/jackc/pgx/v5/stdlib"
 

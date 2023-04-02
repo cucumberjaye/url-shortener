@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/md5"
 	"encoding/hex"
+
 	"github.com/cucumberjaye/url-shortener/configs"
 )
 

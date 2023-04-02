@@ -2,6 +2,7 @@ package postrgresdb
 
 import (
 	"database/sql"
+
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 )
 

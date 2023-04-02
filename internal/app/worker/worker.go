@@ -3,8 +3,9 @@ package worker
 import (
 	"context"
 	"fmt"
-	"github.com/cucumberjaye/url-shortener/models"
 	"sync"
+
+	"github.com/cucumberjaye/url-shortener/models"
 )
 
 const workers = 5
