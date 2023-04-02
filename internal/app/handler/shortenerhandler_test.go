@@ -2,17 +2,18 @@ package handler
 
 import (
 	"bytes"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
+
 	"github.com/cucumberjaye/url-shortener/configs"
 	mocks2 "github.com/cucumberjaye/url-shortener/internal/app/service/mocks"
 	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"testing"
 )
 
 func TestMain(m *testing.M) {
@@ -188,5 +189,31 @@ func TestHandler_JSONShortener(t *testing.T) {
 				assert.Equal(t, tt.want.response, string(resBody))
 			}
 		})
+	}
+}
+
+func BenchmarkGetURL(b *testing.B) {
+	b.StopTimer()
+	logger.New()
+	logger.Discard()
+	URLServices := &mocks2.ServiceMock{}
+	logsServices := &mocks2.LogsMock{}
+	ch := make(chan models.DeleteData)
+	handlers := NewHandler(URLServices, logsServices, ch)
+
+	r := handlers.InitRoutes()
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	request := httptest.NewRequest(http.MethodGet, ts.URL+"/0", nil)
+	request.RequestURI = ""
+
+	http.DefaultClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		http.DefaultClient.Do(request)
 	}
 }
