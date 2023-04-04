@@ -16,8 +16,8 @@ import (
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 )
 
-// GetFullURL перенаправляет на полную ссылку, id короткой ссылки находится после символа /.
-func (h *Handler) GetFullURL(w http.ResponseWriter, r *http.Request) {
+// getFullURL перенаправляет на полную ссылку, id короткой ссылки находится после символа /.
+func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	shortURL := url.URL{
 		Scheme: configs.Scheme,
 		Host:   r.Host,
@@ -45,8 +45,8 @@ func (h *Handler) GetFullURL(w http.ResponseWriter, r *http.Request) {
 	logger.InfoLogger.Printf("%s  URL: %s has been used, total uses: %d", r.Method, shortURL.String(), requestCount)
 }
 
-// Shortener приниает ссылку в формате text, возвращает короткую ссылку.
-func (h *Handler) Shortener(w http.ResponseWriter, r *http.Request) {
+// shortener приниает ссылку в формате text, возвращает короткую ссылку.
+func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 	URL := url.URL{
 		Scheme: configs.Scheme,
 		Host:   r.Host,
@@ -96,8 +96,8 @@ type JSONInput struct {
 	URL string `json:"url"`
 }
 
-// ShortenerJSON приниает ссылку в формате JSON, возвращает короткую ссылку.
-func (h *Handler) ShortenerJSON(w http.ResponseWriter, r *http.Request) {
+// shortenerJSON приниает ссылку в формате JSON, возвращает короткую ссылку.
+func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 	var input = &JSONInput{}
 
 	URL := url.URL{
@@ -147,8 +147,8 @@ func (h *Handler) ShortenerJSON(w http.ResponseWriter, r *http.Request) {
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
 }
 
-// GetUserURL возвращает все сокращенные ссылки пользователя.
-func (h *Handler) GetUserURL(w http.ResponseWriter, r *http.Request) {
+// getUserURL возвращает все сокращенные ссылки пользователя.
+func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 	var out []models.URLs
 
 	URL := url.URL{
@@ -180,8 +180,8 @@ func (h *Handler) GetUserURL(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, out)
 }
 
-// CheckDBConn проверяет работоспособность хранилища (postgreSQL или файла).
-func (h *Handler) CheckDBConn(w http.ResponseWriter, r *http.Request) {
+// checkDBConn проверяет работоспособность хранилища (postgreSQL или файла).
+func (h *Handler) checkDBConn(w http.ResponseWriter, r *http.Request) {
 	URL := url.URL{
 		Scheme: configs.Scheme,
 		Host:   r.Host,
@@ -198,8 +198,8 @@ func (h *Handler) CheckDBConn(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// BatchShortener приниает массив ссылок в формате JSON (с двумя полями в структуре), возвращает массив коротких ссылок.
-func (h *Handler) BatchShortener(w http.ResponseWriter, r *http.Request) {
+// batchShortener приниает массив ссылок в формате JSON (с двумя полями в структуре), возвращает массив коротких ссылок.
+func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 	var input []models.BatchInputJSON
 
 	URL := url.URL{
@@ -246,8 +246,8 @@ func (h *Handler) BatchShortener(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// DeleteUserURL принимает массив коротких ссылок пользователя и удаляет их.
-func (h *Handler) DeleteUserURL(w http.ResponseWriter, r *http.Request) {
+// deleteUserURL принимает массив коротких ссылок пользователя и удаляет их.
+func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 	var input []string
 
 	URL := url.URL{

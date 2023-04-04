@@ -46,21 +46,21 @@ func NewHandler(service URLService, logsService LogsInfoService, ch chan models.
 func (h *Handler) InitRoutes() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.With(mw.GzipCompress, mw.Authentication).Get("/{short}", h.GetFullURL)
+	r.With(mw.GzipCompress, mw.Authentication).Get("/{short}", h.getFullURL)
 
-	r.Get("/ping", h.CheckDBConn)
+	r.Get("/ping", h.checkDBConn)
 	r.With(mw.Authentication).Group(func(r chi.Router) {
 		r.Use(mw.GzipDecompress)
-		r.Post("/", h.Shortener)
+		r.Post("/", h.shortener)
 		r.Route("/api", func(r chi.Router) {
 			r.With(mw.GzipDecompress).Route("/shorten", func(r chi.Router) {
-				r.Post("/", h.ShortenerJSON)
-				r.Post("/batch", h.BatchShortener)
+				r.Post("/", h.shortenerJSON)
+				r.Post("/batch", h.batchShortener)
 			})
 
 			r.Route("/user", func(r chi.Router) {
-				r.Get("/urls", h.GetUserURL)
-				r.Delete("/urls", h.DeleteUserURL)
+				r.Get("/urls", h.getUserURL)
+				r.Delete("/urls", h.deleteUserURL)
 			})
 		})
 	})
