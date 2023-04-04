@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
@@ -15,13 +17,14 @@ import (
 	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/postgres"
 	"github.com/go-chi/chi"
-	"net/http"
 )
 
+// Структура для запуска приложения
 type App struct {
 	mux *chi.Mux
 }
 
+// создаем Арр
 func New() (*App, error) {
 	configs.LoadConfig()
 
@@ -69,6 +72,7 @@ func New() (*App, error) {
 	return app, nil
 }
 
+// запускем сервер
 func (a *App) Run() error {
 	fmt.Println("server running")
 
