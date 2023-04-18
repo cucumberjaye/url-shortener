@@ -9,12 +9,14 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// Анализатор для проверки os.Exit в main функции
 var ExitCheckAnalyzer = &analysis.Analyzer{
 	Name: "exitcheck",
 	Doc:  "check for os exit in main",
 	Run:  run,
 }
 
+// функция для анализатора
 func run(pass *analysis.Pass) (interface{}, error) {
 	checkExit := func(node ast.Node) bool {
 		ast.Inspect(node, func(n ast.Node) bool {
