@@ -76,7 +76,8 @@ func Authentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c, err := r.Cookie("authorization")
 		if err == nil {
-			id, err := token.CheckToken(c.Value)
+			var id string
+			id, err = token.CheckToken(c.Value)
 			if err == nil {
 				ctx := context.WithValue(r.Context(), UserID("user_id"), id)
 				next.ServeHTTP(w, r.WithContext(ctx))

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -32,7 +33,8 @@ func New() (*App, error) {
 	var err error
 
 	if configs.DataBaseDSN != "" {
-		pSQL, err := postgres.New()
+		var pSQL *sql.DB
+		pSQL, err = postgres.New()
 		if err != nil {
 			return nil, err
 		}
