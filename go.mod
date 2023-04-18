@@ -1,6 +1,6 @@
 module github.com/cucumberjaye/url-shortener
 
-go 1.19
+go 1.18
 
 require (
 	github.com/go-chi/chi v1.5.4
@@ -11,7 +11,6 @@ require (
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/tools v0.8.0
-	honnef.co/go/tools v0.4.3
 )
 
 require (
@@ -31,4 +30,5 @@ require (
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	honnef.co/go/tools v0.4.3 // indirect
 )
