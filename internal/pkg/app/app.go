@@ -18,6 +18,7 @@ import (
 	"github.com/cucumberjaye/url-shortener/models"
 	"github.com/cucumberjaye/url-shortener/pkg/postgres"
 	"github.com/go-chi/chi"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 // Структура для запуска приложения
@@ -78,5 +79,27 @@ func New() (*App, error) {
 func (a *App) Run() error {
 	fmt.Println("server running")
 
-	return http.ListenAndServe(configs.ServerAddress, a.mux)
+	var srv *http.Server
+
+	if configs.EnableHTTPS {
+		manager := &autocert.Manager{
+			Cache:  autocert.DirCache("cert"),
+			Prompt: autocert.AcceptTOS,
+		}
+
+		srv = &http.Server{
+			Addr:      configs.ServerAddress,
+			Handler:   a.mux,
+			TLSConfig: manager.TLSConfig(),
+		}
+
+		return srv.ListenAndServeTLS("", "")
+	} else {
+		srv = &http.Server{
+			Addr:    configs.ServerAddress,
+			Handler: a.mux,
+		}
+
+		return srv.ListenAndServe()
+	}
 }
