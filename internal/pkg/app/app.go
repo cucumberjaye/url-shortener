@@ -4,7 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/cucumberjaye/url-shortener/configs"
 	"github.com/cucumberjaye/url-shortener/internal/app/handler"
@@ -83,6 +87,18 @@ func (a *App) Run() error {
 
 	var srv *http.Server
 
+	sigint := make(chan os.Signal, 1)
+	idleConnsClosed := make(chan struct{})
+	signal.Notify(sigint, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+
+	shutdown := func(srv *http.Server) {
+		<-sigint
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Printf("HTTP server Shutdown: %v", err)
+		}
+		close(idleConnsClosed)
+	}
+
 	if configs.EnableHTTPS {
 		manager := &autocert.Manager{
 			Cache:  autocert.DirCache("cert"),
@@ -94,14 +110,23 @@ func (a *App) Run() error {
 			Handler:   a.mux,
 			TLSConfig: manager.TLSConfig(),
 		}
-
-		return srv.ListenAndServeTLS("", "")
+		go shutdown(srv)
+		err := srv.ListenAndServeTLS("", "")
+		if err != nil {
+			return fmt.Errorf("listen server failed with error: %w", err)
+		}
 	} else {
 		srv = &http.Server{
 			Addr:    configs.ServerAddress,
 			Handler: a.mux,
 		}
 
-		return srv.ListenAndServe()
+		go shutdown(srv)
+		err := srv.ListenAndServe()
+		if err != nil {
+			return fmt.Errorf("listen server failed with error: %w", err)
+		}
 	}
+	<-idleConnsClosed
+	return nil
 }
