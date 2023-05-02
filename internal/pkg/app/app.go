@@ -111,8 +111,8 @@ func (a *App) Run() error {
 			TLSConfig: manager.TLSConfig(),
 		}
 		go shutdown(srv)
-		err := srv.ListenAndServeTLS("", "")
-		if err != nil {
+
+		if err := srv.ListenAndServeTLS("", ""); err != http.ErrServerClosed {
 			return fmt.Errorf("listen server failed with error: %w", err)
 		}
 	} else {
@@ -122,8 +122,8 @@ func (a *App) Run() error {
 		}
 
 		go shutdown(srv)
-		err := srv.ListenAndServe()
-		if err != nil {
+
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			return fmt.Errorf("listen server failed with error: %w", err)
 		}
 	}
