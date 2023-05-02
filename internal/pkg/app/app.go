@@ -28,10 +28,12 @@ type App struct {
 
 // создаем Арр
 func New() (*App, error) {
-	configs.LoadConfig()
+	err := configs.LoadConfig()
+	if err != nil {
+		return nil, fmt.Errorf("load config failed with error: %w", err)
+	}
 
 	var keeper repository.Keeper
-	var err error
 
 	if configs.DataBaseDSN != "" {
 		var pSQL *sql.DB

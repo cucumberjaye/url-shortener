@@ -10,6 +10,7 @@ var (
 	BaseURL         string // базовый адрес результирующего сокращённого URL
 	FileStoragePath string // путь к файлу для хранения данных
 	DataBaseDSN     string // для подключения к postgreSQL
+	Config          string // json file
 )
 
 // дефолтные значения
@@ -23,6 +24,7 @@ func InitFlags() {
 	flag.StringVar(&BaseURL, "b", "", "base address for get method result")
 	flag.StringVar(&FileStoragePath, "f", "", "file storage path")
 	flag.StringVar(&DataBaseDSN, "d", "", "database URL")
+	flag.StringVar(&Config, "c", "", "json config file path")
 
 	flag.Parse()
 }
