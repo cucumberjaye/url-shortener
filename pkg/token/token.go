@@ -1,3 +1,4 @@
+// Пакет для генерации и расшифровки токена авторизации
 package token
 
 import (
@@ -5,9 +6,11 @@ import (
 	"crypto/cipher"
 	"crypto/md5"
 	"encoding/hex"
+
 	"github.com/cucumberjaye/url-shortener/configs"
 )
 
+// GenerateNewToken генерирует токен из id по aes алгоритму.
 func GenerateNewToken(id string) (string, error) {
 	key := md5.Sum([]byte(configs.SigningKey))
 
@@ -26,6 +29,7 @@ func GenerateNewToken(id string) (string, error) {
 	return hex.EncodeToString(enc), nil
 }
 
+// CheckToken расшифровывает токен и получает из него id.
 func CheckToken(token string) (string, error) {
 	data, err := hex.DecodeString(token)
 	if err != nil {
