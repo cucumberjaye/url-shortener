@@ -29,7 +29,7 @@ const (
 // для парсинга значений из файла конфигураций
 type configJSON struct {
 	ServerAddress   string `json:"server_address"`
-	BaseUrl         string `json:"base_url"`
+	BaseURL         string `json:"base_url"`
 	FileStoragePath string `json:"file_storage_path"`
 	DatabaseDsn     string `json:"database_dsn"`
 	EnableHTTPS     bool   `json:"enable_https"`
@@ -83,7 +83,7 @@ func readConfigFile() error {
 			ServerAddress = cfg.ServerAddress
 		}
 		if len(BaseURL) == 0 {
-			BaseURL = cfg.BaseUrl
+			BaseURL = cfg.BaseURL
 		}
 		if len(FileStoragePath) == 0 {
 			FileStoragePath = cfg.FileStoragePath
