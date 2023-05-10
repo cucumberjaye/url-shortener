@@ -2,23 +2,28 @@ package postrgresdb
 
 import (
 	"database/sql"
+
 	"github.com/cucumberjaye/url-shortener/internal/app/repository"
 )
 
+// структура SQL хранилища
 type SQLStore struct {
 	db *sql.DB
 }
 
+// Создаем структуру для базы данных
 func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{
 		db: db,
 	}
 }
 
+// проверяем работоспособность базы данных
 func (k *SQLStore) CheckKeeper() error {
 	return k.db.Ping()
 }
 
+// получаем все данные из бд
 func (k *SQLStore) GetAllData() (repository.DB, error) {
 	users := repository.DB{
 		Store: map[string]map[string]string{},
@@ -58,6 +63,7 @@ func (k *SQLStore) GetAllData() (repository.DB, error) {
 	return users, nil
 }
 
+// записываем данные в бд
 func (k *SQLStore) Set(users repository.DB) error {
 	for key, val := range users.Store {
 		for short, full := range val {
