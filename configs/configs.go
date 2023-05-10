@@ -56,8 +56,8 @@ func LoadConfig() error {
 		Scheme = "https"
 	}
 
-	DataBaseDSN = lookUpOrSetDefault("TLSCERT", defaultTLSCert)
-	DataBaseDSN = lookUpOrSetDefault("TLSKEY", defaultTLSKey)
+	TLSCert = lookUpOrSetDefault("TLSCERT", defaultTLSCert)
+	TLSKey = lookUpOrSetDefault("TLSKEY", defaultTLSKey)
 
 	return readConfigFile()
 }
