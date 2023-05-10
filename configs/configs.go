@@ -18,12 +18,16 @@ var (
 	DataBaseDSN     string          // для подключения к postgreSQL
 	EnableHTTPS     bool   = false  // https
 	Config          string          // json file
+	TLSCert         string          // tls cert.pem
+	TLSKey          string          // tls key.pem
 )
 
 // значения пол умолчанию
 const (
 	defaultScheme     = "http"
 	defaultSigningKey = "qwerty1234"
+	defaultTLSCert    = "cert/server.crt"
+	defaultTLSKey     = "cert/server.key"
 )
 
 // для парсинга значений из файла конфигураций
@@ -51,6 +55,9 @@ func LoadConfig() error {
 		EnableHTTPS = true
 		Scheme = "https"
 	}
+
+	DataBaseDSN = lookUpOrSetDefault("TLSCERT", defaultTLSCert)
+	DataBaseDSN = lookUpOrSetDefault("TLSKEY", defaultTLSKey)
 
 	return readConfigFile()
 }

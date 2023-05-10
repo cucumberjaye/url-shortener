@@ -112,7 +112,7 @@ func (a *App) Run() error {
 		}
 		go shutdown(srv)
 
-		if err := srv.ListenAndServeTLS("", ""); err != http.ErrServerClosed {
+		if err := srv.ListenAndServeTLS(configs.TLSCert, configs.TLSKey); err != http.ErrServerClosed {
 			return fmt.Errorf("listen server failed with error: %w", err)
 		}
 	} else {
