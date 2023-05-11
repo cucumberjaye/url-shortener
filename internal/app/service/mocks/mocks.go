@@ -44,3 +44,7 @@ func (m *ServiceMock) BatchSetURL(data []models.BatchInputJSON, baseURL string, 
 // мок для BatchDeleteURL
 func (m *ServiceMock) BatchDeleteURL(data []string, id string) {
 }
+
+func (m *ServiceMock) GetStats() (models.Stats, error) {
+	return models.Stats{}, nil
+}

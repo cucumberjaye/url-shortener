@@ -11,6 +11,7 @@ var (
 	FileStoragePath string // путь к файлу для хранения данных
 	DataBaseDSN     string // для подключения к postgreSQL
 	Config          string // json file
+	TrustedSubnet   string // trusted ip
 )
 
 // дефолтные значения
@@ -25,6 +26,7 @@ func InitFlags() {
 	flag.StringVar(&FileStoragePath, "f", "", "file storage path")
 	flag.StringVar(&DataBaseDSN, "d", "", "database URL")
 	flag.StringVar(&Config, "c", "", "json config file path")
+	flag.StringVar(&TrustedSubnet, "t", "", "trusted ip")
 
 	flag.Parse()
 }

@@ -24,6 +24,7 @@ type URLService interface {
 	GetAllUserURL(id string) ([]models.URLs, error)
 	CheckDBConn() error
 	BatchSetURL(data []models.BatchInputJSON, baseURL string, id string) ([]models.BatchInputJSON, error)
+	GetStats() (models.Stats, error)
 }
 
 // Handler хранит обЪекты сервисов для их испльзования.
@@ -61,6 +62,10 @@ func (h *Handler) InitRoutes() *chi.Mux {
 			r.Route("/user", func(r chi.Router) {
 				r.Get("/urls", h.getUserURL)
 				r.Delete("/urls", h.deleteUserURL)
+			})
+
+			r.Route("/internal", func(r chi.Router) {
+				r.Get("/stats", h.stats)
 			})
 		})
 	})

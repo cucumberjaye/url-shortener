@@ -208,3 +208,19 @@ func (d *LocalStorage) BatchDeleteURL(short, id string) error {
 func (d *LocalStorage) CheckStorage() error {
 	return d.keeper.CheckKeeper()
 }
+
+func (d *LocalStorage) GetStats() (models.Stats, error) {
+	var urlsCount, usersCount int
+
+	for _, user := range d.users.Exist {
+		usersCount++
+		for range user {
+			urlsCount++
+		}
+	}
+
+	return models.Stats{
+		URLs:  urlsCount,
+		Users: usersCount,
+	}, nil
+}

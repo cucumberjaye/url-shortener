@@ -17,6 +17,7 @@ type URLRepository interface {
 	GetAllUserURL(id string) ([]models.URLs, error)
 	BatchSetURL(data []models.BatchInputJSON, shortURL []string, id string) ([]models.BatchInputJSON, error)
 	CheckStorage() error
+	GetStats() (models.Stats, error)
 }
 
 // общий интерфейс

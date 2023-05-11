@@ -20,6 +20,7 @@ var (
 	Config          string          // json file
 	TLSCert         string          // tls cert.pem
 	TLSKey          string          // tls key.pem
+	TrustedSubnet   string          // trusted ip
 )
 
 // значения пол умолчанию
@@ -37,6 +38,7 @@ type configJSON struct {
 	FileStoragePath string `json:"file_storage_path"`
 	DatabaseDsn     string `json:"database_dsn"`
 	EnableHTTPS     bool   `json:"enable_https"`
+	TrustedSubnet   string `json:"trusted_subnet"`
 }
 
 // LoadConfig устанавливает переменные из env
@@ -48,6 +50,7 @@ func LoadConfig() error {
 	FileStoragePath = lookUpOrSetDefault("FILE_STORAGE_PATH", flags.FileStoragePath)
 	SigningKey = lookUpOrSetDefault("SIGNING_KEY", defaultSigningKey)
 	DataBaseDSN = lookUpOrSetDefault("DATABASE_DSN", flags.DataBaseDSN)
+	TrustedSubnet = lookUpOrSetDefault("TRUSTED_SUBNET", flags.TrustedSubnet)
 	Config = os.Getenv("CONFIG")
 
 	env, ok := os.LookupEnv("ENABLE_HTTPS")
@@ -100,6 +103,9 @@ func readConfigFile() error {
 		}
 		if EnableHTTPS {
 			EnableHTTPS = cfg.EnableHTTPS
+		}
+		if len(TrustedSubnet) == 0 {
+			TrustedSubnet = cfg.TrustedSubnet
 		}
 	}
 

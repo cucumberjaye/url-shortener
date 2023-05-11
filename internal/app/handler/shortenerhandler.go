@@ -281,6 +281,27 @@ func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// stats возвращает статистику по сервису.
+func (h *Handler) stats(w http.ResponseWriter, r *http.Request) {
+	if len(configs.TrustedSubnet) == 0 {
+		http.Error(w, "forbiden in configuration", http.StatusForbidden)
+		return
+	}
+	if configs.TrustedSubnet != r.Header.Get("X-Real-IP") {
+		http.Error(w, "forbiden for ip", http.StatusForbidden)
+		return
+	}
+	stats, err := h.Service.GetStats()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.ErrorLogger.Println(err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, stats)
+}
+
 // baseURL формирует корроткую ссылку
 func baseURL(r *http.Request) string {
 	if configs.BaseURL != "" {

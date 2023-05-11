@@ -69,3 +69,8 @@ func (s *ShortenerService) BatchSetURL(data []models.BatchInputJSON, baseURL str
 	}
 	return s.repos.BatchSetURL(data, shortURL, id)
 }
+
+// получаем статистику
+func (s *ShortenerService) GetStats() (models.Stats, error) {
+	return s.repos.GetStats()
+}
