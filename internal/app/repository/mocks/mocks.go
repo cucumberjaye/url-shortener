@@ -35,7 +35,3 @@ func (r *RepositoryMock) GetURLCount() int64 {
 func (r *RepositoryMock) GetAllUserURL(id int) []models.URLs {
 	return []models.URLs{}
 }
-
-func (r *RepositoryMock) GetStats() (models.Stats, error) {
-	return models.Stats{}, nil
-}

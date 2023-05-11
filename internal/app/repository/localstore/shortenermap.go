@@ -209,6 +209,7 @@ func (d *LocalStorage) CheckStorage() error {
 	return d.keeper.CheckKeeper()
 }
 
+// получаем количество пользователей и ссылок
 func (d *LocalStorage) GetStats() (models.Stats, error) {
 	var urlsCount, usersCount int
 
