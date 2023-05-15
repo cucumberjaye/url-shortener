@@ -79,6 +79,7 @@ func (s *ShortenerServer) Shortener(ctx context.Context, in *pb.Original) (*pb.S
 	return &pb.Short{ShortUrl: shortURL}, nil
 }
 
+// проверяет работоспособность хранилища (postgreSQL или файла).
 func (s *ShortenerServer) Ping(ctx context.Context, in *pb.Empty) (*pb.CommonResponse, error) {
 	err := s.Service.CheckDBConn()
 	if err != nil {
