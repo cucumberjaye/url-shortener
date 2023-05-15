@@ -10,21 +10,23 @@ import (
 
 // переменные для считывания env значений
 var (
-	ServerAddress   string          // адрес сервера
-	BaseURL         string          // базовый адрес результирующего сокращённого URL
-	Scheme          string = "http" // http или https
-	FileStoragePath string          // путь к файлу для хранения данных
-	SigningKey      string          // для генерации токена авторизации
-	DataBaseDSN     string          // для подключения к postgreSQL
-	EnableHTTPS     bool   = false  // https
-	Config          string          // json file
-	TLSCert         string          // tls cert.pem
-	TLSKey          string          // tls key.pem
-	TrustedSubnet   string          // trusted ip
+	ServerAddress     string          // адрес сервера
+	GRPCServerAddress string          // адрес grpc сервера
+	BaseURL           string          // базовый адрес результирующего сокращённого URL
+	Scheme            string = "http" // http или https
+	FileStoragePath   string          // путь к файлу для хранения данных
+	SigningKey        string          // для генерации токена авторизации
+	DataBaseDSN       string          // для подключения к postgreSQL
+	EnableHTTPS       bool   = false  // https
+	Config            string          // json file
+	TLSCert           string          // tls cert.pem
+	TLSKey            string          // tls key.pem
+	TrustedSubnet     string          // trusted ip
 )
 
 // значения пол умолчанию
 const (
+	defaultGRPCAddr   = ":3200"
 	defaultScheme     = "http"
 	defaultSigningKey = "qwerty1234"
 	defaultTLSCert    = "cert/server.crt"
@@ -46,6 +48,7 @@ func LoadConfig() error {
 	flags.InitFlags()
 
 	ServerAddress = lookUpOrSetDefault("SERVER_ADDRESS", flags.ServerAddress)
+	GRPCServerAddress = lookUpOrSetDefault("GRPC_SERVER_ADDRESS", defaultGRPCAddr)
 	BaseURL = lookUpOrSetDefault("BASE_URL", flags.BaseURL)
 	FileStoragePath = lookUpOrSetDefault("FILE_STORAGE_PATH", flags.FileStoragePath)
 	SigningKey = lookUpOrSetDefault("SIGNING_KEY", defaultSigningKey)

@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package internal.app.pb;
+
+option go_package = ".;pb";
+
+message Short {
+    string short_url = 1; 
+}
+
+message Original {
+    string original_url = 1;
+}
+
+message BatchOriginal {
+    string correlation_id = 1;
+    string original_url = 2;
+}
+
+message BatchShort {
+    string correlation_id = 1;
+    string short_url = 2;
+}
+
+message BatchRequest {
+    repeated BatchOriginal original_urls = 1;
+}
+
+message BatchResponse {
+    repeated BatchShort short_urls = 1;
+}
+
+message URLs {
+    string short_url = 1;
+    string original_url = 2;
+}
+
+message URLsResponse {
+    repeated URLs urls = 1;
+}
+
+message BatchDelete {
+    repeated Short short_urls = 1;
+}
+
+message Empty {}
+
+message CommonResponse {
+    enum Status {
+    OK = 0;
+    FAIL = 1;
+    }
+    
+    Status status = 1;
+}
+
+message StatsInfo {
+    int32 urls_count = 1;
+    int32 users_count = 2;
+}
+
+message AuthToken {
+    string token = 1;
+}
+
+service ShotenerService {
+    rpc Authentication(Empty) returns (AuthToken);
+    rpc GetFullURL(Short) returns (Original);
+    rpc Shortener(Original) returns (Short);
+    rpc Ping(Empty) returns (CommonResponse);
+    rpc BatchShortnener(BatchRequest) returns (BatchResponse);
+    rpc GetUserURL(Empty) returns (URLsResponse);
+    rpc DeleteUserURL(BatchDelete) returns (CommonResponse);
+    rpc Stats(Empty) returns (StatsInfo);
+}
+
+
+

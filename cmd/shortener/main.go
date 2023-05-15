@@ -5,6 +5,7 @@ import (
 
 	"github.com/cucumberjaye/url-shortener/internal/pkg/app"
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -25,8 +26,12 @@ func main() {
 		logger.ErrorLogger.Fatal(err)
 	}
 
-	err = shortener.Run()
-	if err != nil {
+	g := new(errgroup.Group)
+
+	g.Go(shortener.Run)
+	g.Go(shortener.GRPCRun)
+
+	if err := g.Wait(); err != nil {
 		logger.ErrorLogger.Fatal(err)
 	}
 }
