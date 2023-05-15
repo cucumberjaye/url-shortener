@@ -1,11 +1,12 @@
 package handler
 
 import (
-	mw "github.com/cucumberjaye/url-shortener/internal/app/middleware"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
+
+	mw "github.com/cucumberjaye/url-shortener/internal/app/middleware"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -15,6 +16,7 @@ import (
 	"github.com/cucumberjaye/url-shortener/pkg/logger"
 )
 
+// getFullURL перенаправляет на полную ссылку, id короткой ссылки находится после символа /.
 func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	shortURL := url.URL{
 		Scheme: configs.Scheme,
@@ -22,8 +24,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 		Path:   r.URL.Path,
 	}
 
-	short := chi.URLParam(r, "short")
-	short = baseURL(r) + short
+	short := baseURL(r) + chi.URLParam(r, "short")
 	fullURL, err := h.Service.GetFullURL(short)
 	if err != nil && err.Error() == "URL was deleted" {
 		w.WriteHeader(http.StatusGone)
@@ -44,6 +45,7 @@ func (h *Handler) getFullURL(w http.ResponseWriter, r *http.Request) {
 	logger.InfoLogger.Printf("%s  URL: %s has been used, total uses: %d", r.Method, shortURL.String(), requestCount)
 }
 
+// shortener приниает ссылку в формате text, возвращает короткую ссылку.
 func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 	URL := url.URL{
 		Scheme: configs.Scheme,
@@ -71,8 +73,7 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fullURL := string(body)
-	fullURL = strings.Trim(fullURL, "\n")
+	fullURL := strings.Trim(string(body), "\n")
 	shortURL, err := h.Service.ShortingURL(fullURL, baseURL(r), id)
 	if err != nil && err.Error() == "url already exists" {
 		w.WriteHeader(http.StatusConflict)
@@ -90,10 +91,12 @@ func (h *Handler) shortener(w http.ResponseWriter, r *http.Request) {
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
 }
 
+// JSON структура, которую принимает ShortenerJSON
 type JSONInput struct {
 	URL string `json:"url"`
 }
 
+// shortenerJSON приниает ссылку в формате JSON, возвращает короткую ссылку.
 func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 	var input = &JSONInput{}
 
@@ -144,6 +147,7 @@ func (h *Handler) shortenerJSON(w http.ResponseWriter, r *http.Request) {
 	logger.InfoLogger.Printf("%s  Full URL: %s has been added with short URL: %s", r.Method, fullURL, shortURL)
 }
 
+// getUserURL возвращает все сокращенные ссылки пользователя.
 func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 	var out []models.URLs
 
@@ -176,6 +180,7 @@ func (h *Handler) getUserURL(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, out)
 }
 
+// checkDBConn проверяет работоспособность хранилища (postgreSQL или файла).
 func (h *Handler) checkDBConn(w http.ResponseWriter, r *http.Request) {
 	URL := url.URL{
 		Scheme: configs.Scheme,
@@ -193,9 +198,9 @@ func (h *Handler) checkDBConn(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// batchShortener приниает массив ссылок в формате JSON (с двумя полями в структуре), возвращает массив коротких ссылок.
 func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 	var input []models.BatchInputJSON
-	var out = []models.BatchOutputJSON{}
 
 	URL := url.URL{
 		Scheme: configs.Scheme,
@@ -222,12 +227,14 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 		logger.WarningLogger.Printf("%s  %s: %s", r.Method, URL.String(), err.Error())
 		return
 	}
+	length := len(tmp)
+	out := make([]models.BatchOutputJSON, length)
 
-	for i := 0; i < len(tmp); i++ {
-		out = append(out, models.BatchOutputJSON{
+	for i := 0; i < length; i++ {
+		out[i] = models.BatchOutputJSON{
 			CorrelationID: tmp[i].CorrelationID,
 			ShortURL:      tmp[i].OriginalURL,
-		})
+		}
 	}
 
 	render.Status(r, http.StatusCreated)
@@ -239,6 +246,7 @@ func (h *Handler) batchShortener(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// deleteUserURL принимает массив коротких ссылок пользователя и удаляет их.
 func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 	var input []string
 
@@ -273,6 +281,28 @@ func (h *Handler) deleteUserURL(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// stats возвращает статистику по сервису.
+func (h *Handler) stats(w http.ResponseWriter, r *http.Request) {
+	if len(configs.TrustedSubnet) == 0 {
+		http.Error(w, "forbiden in configuration", http.StatusForbidden)
+		return
+	}
+	if configs.TrustedSubnet != r.Header.Get("X-Real-IP") {
+		http.Error(w, "forbiden for ip", http.StatusForbidden)
+		return
+	}
+	stats, err := h.Service.GetStats()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logger.ErrorLogger.Println(err.Error())
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, stats)
+}
+
+// baseURL формирует корроткую ссылку
 func baseURL(r *http.Request) string {
 	if configs.BaseURL != "" {
 		return configs.BaseURL + "/"

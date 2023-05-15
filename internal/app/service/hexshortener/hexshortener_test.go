@@ -3,10 +3,11 @@ package hexshortener
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/cucumberjaye/url-shortener/internal/app/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestShortenerService_GetFullURL(t *testing.T) {

@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"errors"
+
 	"github.com/cucumberjaye/url-shortener/configs"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -11,6 +12,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+// Подключается к postgreSQL
 func New() (*sql.DB, error) {
 	db, err := sql.Open("pgx", configs.DataBaseDSN)
 	if err != nil {
